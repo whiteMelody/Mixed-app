@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="pragma" content="no-cache">
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta content="telephone=no,email=no" name="format-detection" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no"/>
+  <title>足球资讯</title>
+
+  <link type="text/css" rel="stylesheet" href="https://mp.bombsport.com/source/css/base.css">
+  <script type="text/javascript" src="https://mp.bombsport.com/source/js/vue.min.js"></script>
+  <script type="text/javascript" src="https://mp.bombsport.com/source/js/jquery2.1.4.js"></script>
+  <script type="text/javascript" src="https://mp.bombsport.com/source/js/md5.js"></script>
+
+  <style>
+    .f_center{ text-indent: 0 !important; margin: 10px 0; }
+    .news-content p{ text-indent: 32px; }
+  </style>
+
+</head>
+<body class="warpper-white">
+
+  <div id="moreNewsPage">
+
+    <!--<div class="wb100 h40px warpper-red">-->
+      <!--<p class="wb70 text-over-hidden1 absolute text-center h40px lh40px F16 Fwhite" style="top: 0; left: 0; right: 0; margin: 0 auto;">足球资讯</p>-->
+    <!--</div>-->
+
+    <div class="pa10">
+      <p class="lh30px F20 Fblack Fb">{{newsDetail.title}}</p>
+      <div class="clear h10px"></div>
+      <p class="F14 Fgray-2 lh20px">
+        <span class="fl">{{formatDate(newsDetail.date)}}</span>
+        <span class="fl mal30">来源：{{newsDetail.source}}</span>
+      </p>
+    </div>
+
+    <div class="clear1 bor-gray bor-solid-1b"></div>
+
+    <div class="pa10 Fgray-3 lh30px news-content" style="font-weight: normal; text-align: justify;">
+
+      <div class="img-Warea" v-html="newsDetail.body"></div>
+
+      <div class="clear1"></div>
+
+    </div>
+  </div>
+
+  <div class="hidden">
+    <script src="https://s22.cnzz.com/z_stat.php?id=1273317413&web_id=1273317413" language="JavaScript"></script>
+  </div>
+
+  <script>
+
+    var base = {
+
+      /**
+       * 通过key获取浏览器的参数
+       * @param paras 	参数名
+       * @param _url		浏览器地址（可选参数）
+       * @returns {*}	参数值
+       */
+      getParmar: function getParmar(paras, _url) {
+        var url = location.href;
+        if (_url) url = _url;
+        var paraString = url.substring(url.indexOf("?") + 1, url.length).split("&");
+        var paraObj = {};
+        for (var i = 0, j = 0; j = paraString[i]; i++) {
+          paraObj[j.substring(0, j.indexOf("=")).toLowerCase()] = j.substring(j.indexOf("=") + 1, j.length);
+        }
+        var returnValue = paraObj[paras.toLowerCase()];
+
+        return returnValue;
+      },
+
+      /**
+       * 通过name删除本地cookie
+       * @param name		cookie名
+       */
+      delCookie: function delCookie(name) {
+        document.cookie = name + "=;expires=" + new Date(0).toGMTString();
+      },
+
+      /**
+       * 通过name获取本地cookie
+       * @param objName	cookie名
+       */
+      getCookie: function getCookie(objName) {
+        var arrStr = document.cookie.split("; ");
+        for (var i = 0; i < arrStr.length; i++) {
+          var temp = arrStr[i].split("=");
+          if (temp[0] == objName) return unescape(temp[1]);
+        }
+      },
+
+      /**
+       * 设置本地cookie
+       * @param name		cookie名
+       * @param value		cookie值
+       * @param day		cookie保存天数
+       */
+      setCookie: function setCookie(name, value, day) {
+        if (day == null || day == "" || day == undefined) day = 30;
+        var exp = new Date();
+        exp.setTime(exp.getTime() + day * 24 * 60 * 60 * 1000);
+        document.cookie = name + "=" + escape(value) + ";expires=" + exp.toGMTString();
+      },
+
+      /**
+       * 生成一个UUID
+       * @returns {string}
+       */
+      getUuid: function getUuid() {
+        var len = 32; //32长度
+        var radix = 16; //16进制
+        var chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'.split('');var uuid = [],
+          i;radix = radix || chars.length;if (len) {
+          for (i = 0; i < len; i++) {
+            uuid[i] = chars[0 | Math.random() * radix];
+          }
+        } else {
+          var r;uuid[8] = uuid[13] = uuid[18] = uuid[23] = '-';uuid[14] = '4';for (i = 0; i < 36; i++) {
+            if (!uuid[i]) {
+              r = 0 | Math.random() * 16;uuid[i] = chars[i == 19 ? r & 0x3 | 0x8 : r];
+            }
+          }
+        }
+        return uuid.join('');
+      },
+
+      /**
+       * unicode转码
+       * @param str
+       * @returns {string}
+       */
+      encodeUnicode: function encodeUnicode(str) {
+        var res = [];
+        for (var i = 0; i < str.length; i++) {
+          res[i] = ("00" + str.charCodeAt(i).toString(16)).slice(-4);
+        }
+        return "\\u" + res.join("\\u");
+      },
+
+      /**
+       * unicode解码
+       * @param str
+       */
+      decodeUnicode: function decodeUnicode(str) {
+        str = str.replace(/\\/g, "%");
+        return unescape(str);
+      },
+
+      /**
+       * 判断一个值是否为空
+       * @param obj			任意类型
+       * @returns {boolean}	是否为空
+       */
+      isNull: function isNull(obj) {
+        if (obj == undefined || obj == 'undefined' || obj == null || obj == 'null' || obj == "" || obj.length == 0) return true;else return false;
+      },
+
+
+      /**
+       * stringToDate
+       * @param dateString
+       * @returns {Date}
+       */
+      stringToDate: function(dateString) {
+        if (dateString) {
+          var arr1 = dateString.split(" ");
+          var sdate = arr1[0].split('-');
+          var sdate2 = arr1[1].split(':');
+          var date = new Date(sdate[0], sdate[1]-1, sdate[2], sdate2[0], sdate2[1], sdate2[2]);
+          return date;
+        }
+      },
+
+      /**
+       * 通过时间戳获取离现在的时间（几天前，几分钟前，几小时前）
+       * @param dateTimeStamp				时间戳
+       * @returns {string|*|string}		（几天前，几分钟前，几小时前）
+       */
+      getDateDiff: function(dateTimeStamp) {
+        var minute = 1000 * 60;
+        var hour = minute * 60;
+        var day = hour * 24;
+        var halfamonth = day * 15;
+        var month = day * 30;
+        var now = new Date().getTime();
+        var diffValue = now - dateTimeStamp;
+        if (diffValue < 0) {
+          //若日期不符则弹出窗口告之
+          console.log("结束日期不能小于开始日期！");
+        }
+        var monthC = diffValue / month;
+        var weekC = diffValue / (7 * day);
+        var dayC = diffValue / day;
+        var hourC = diffValue / hour;
+        var minC = diffValue / minute;
+        var result = "";
+        if (monthC >= 1) {
+          result = parseInt(monthC) + '个月前';
+        } else if (weekC >= 1) {
+          result = parseInt(weekC)+'周前';
+        } else if (dayC >= 1) {
+          result = parseInt(dayC)+'天前';
+        } else if (hourC >= 1) {
+          result = parseInt(hourC)+'个小时前';
+        } else if (minC >= 1) {
+          result = parseInt(minC)+'分钟前';
+        } else result = "刚刚";
+        return result;
+      },
+
+      /**
+       * 获取浏览器信息
+       * 取值方式versions.isType(*) == true/false
+       */
+      versions: function () {
+        var u = navigator.userAgent,
+          app = navigator.appVersion;
+        return { //移动终端浏览器版本信息
+          isTrident: u.indexOf('Trident') > -1, //IE内核
+          isPresto: u.indexOf('Presto') > -1, //opera内核
+          isWebKit: u.indexOf('AppleWebKit') > -1, //苹果、谷歌内核
+          isGecko: u.indexOf('Gecko') > -1 && u.indexOf('KHTML') == -1, //火狐内核
+          isMobile: !!u.match(/AppleWebKit.*Mobile.*/), //是否为移动终端
+          isIos: !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/), //ios终端
+          isAndroid: u.indexOf('Android') > -1 || u.indexOf('Linux') > -1, //android终端或uc浏览器
+          isIPhone: u.indexOf('iPhone') > -1, //是否为iPhone或者QQHD浏览器
+          isIPad: u.indexOf('iPad') > -1, //是否iPad
+          isWebApp: u.indexOf('Safari') == -1, //是否web应该程序，没有头部与底部
+          isWeiXin: u.match(/MicroMessenger/i) == 'MicroMessenger' || u.match(/MicroMessenger/i) == 'micromessenger', //微信浏览器
+          isIosApp : u.indexOf('ticket_ios') > -1, //ios客户端版本
+          isAndroidApp : u.indexOf('ticket_android') > -1 //安卓客户端版本
+        };
+      }(),
+      language: (navigator.browserLanguage || navigator.language).toLowerCase()
+    };
+  </script>
+
+  <script>
+
+    function getAjaxSign(params) {
+      var _timestamp = Math.round(new Date().getTime() / 1000);
+
+      var arr = [];
+
+      var str = '';
+
+      if (base.isNull(params)) {
+        params = {};
+      }
+
+      var deviceID = base.getCookie('deviceID');
+
+      if (base.isNull(deviceID)) {
+        deviceID = base.getUuid();
+        base.setCookie('deviceID', deviceID, 365);
+      }
+
+      params.uuid = 0;
+      params.deviceID = deviceID;
+      params.source = 'wap';
+      params.deviceType = '1';
+      params.timestemp = _timestamp;
+
+      $.each(params, function (key, value) {
+        arr.push(key);
+      });
+
+      arr = arr.sort();
+
+      for (var i = 0; i < arr.length; i++) {
+        var _tmp = arr[i] + '=' + params[arr[i]] + '&';
+        str += _tmp;
+      }
+
+      str += 'key=lottery@213cbs!';
+
+      params.sign = md5(str);
+
+      return params;
+    }
+
+    var vm = new Vue({
+      el: "#moreNewsPage",
+      data: {
+        fullscreenLoading: true,
+        newsDetail: {},
+        empty: false,
+        myHeight: 0,
+        matchList: [],
+      },
+      methods: {
+
+        formatDate: function(str){
+          var date = base.stringToDate(str);
+          var now = new Date().getTime();
+          if(now - date.getTime() > 86400 * 1000 * 2){
+            //超过二天
+            return str.substring(5, str.length-3)
+          }else{
+            return base.getDateDiff(date.getTime())
+          }
+        },
+
+        getData: function() {
+
+          var _this = this;
+
+          var _sign = getAjaxSign({
+            newsID: base.getParmar('newsID')
+          })
+
+          $.ajax({
+            type: "post",
+            url: 'https://s.bombsport.com:4432/matchNews/news',
+            // url: "http://192.168.8.150:9713/user/confirmPayee",
+            data: { newsID: _sign.newsID, uuid: _sign.uuid, deviceID: _sign.deviceID, source: _sign.source, deviceType: _sign.deviceType, sign: _sign.sign, timestemp: _sign.timestemp },
+            dataType: "json",
+            success: function(data) {
+              if (data.status == 1) {
+
+                _this.newsDetail = data.returnJSON.news;
+                _this.matchList = data.returnJSON.matchList;
+              }
+            }
+          });
+
+        },
+
+      },
+
+      mounted: function(){
+        this.getData();
+      }
+
+    });
+
+  </script>
+
+</body>
+</html>

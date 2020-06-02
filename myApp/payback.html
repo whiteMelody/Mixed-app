@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no"/>
+    <title>完成支付</title>
+
+</head>
+<body>
+
+<div class="msg1" style="display: none;">
+  <div style="color: #666; line-height: 25px;">
+    <p>1、请在微信内完成支付，支付成功会自动跳转</p>
+    <p>2、如果您未支付，请点击“去支付”完成支付</p>
+    <p>3、如果您未安装微信6.0.2以上版本，请先安装微信并登录后使用微信支付</p>
+    <p>4、若充值成功未能及时到账请联系客服</p>
+    <p>电话/微信：<a href="tel:13310227366" style="color: #4393e5; text-decoration: none">13310227366 </a></p>
+  </div>
+
+  <div style="clear:  both; height: 30px;"></div>
+
+  <div style="padding: 30px;">
+    <div class="donePay" style="width: 100%; height: 40px; line-height: 40px; text-align: center; background:#4393e5; color: #fff; border-radius: 5px;">
+      我已完成支付
+    </div>
+
+    <div style="clear:  both; height: 30px;"></div>
+
+    <!--<a href="tel:13272721166" style="text-decoration: none">-->
+      <div class="toPay" style="width: 100%; height: 40px; line-height: 40px; text-align: center; background:#4393e5; color: #fff; border-radius: 5px;">
+        支付遇到问题
+      </div>
+    <!--</a>-->
+
+  </div>
+</div>
+
+<div class="msg2" style="display: none;">
+  <div style="clear:  both; height: 200px;"></div>
+  <p style="text-align: center; color: #333;">您已完成支付，请返回应用查看</p>
+  <p style="text-align: left; padding: 15px; font-size: 14px; color: #999; line-height: 20px;">如果您未安装微信6.0.2以上版本，请先安装微信并登录后使用微信支付</p>
+  <!--<p>4、若充值成功未能及时到账请联系客服</p>-->
+</div>
+
+
+<script type="text/javascript" src="https://mp.bombsport.com/source/js/jquery2.1.4.js"></script>
+<script type="text/javascript" src="https://mp.bombsport.com/source/js/md5.js"></script>
+<script>
+  var Base = {
+    /**
+     * 判断一个值是否为空
+     * @param obj			任意类型
+     * @returns {boolean}	是否为空
+     */
+    isNull: function isNull(obj) {
+      if (obj == undefined || obj == 'undefined' || obj == null || obj == 'null' || obj == "" || obj.length == 0) return true;else return false;
+    },
+
+
+    /**
+     * 获取地址栏参数
+     */
+    getParmar: function getParmar(paras, _url) {
+      var url = location.href;
+      if (_url) url = _url;
+      var paraString = url.substring(url.indexOf("?") + 1, url.length).split("&");
+      var paraObj = {};
+      for (var i = 0, j = 0; j = paraString[i]; i++) {
+        paraObj[j.substring(0, j.indexOf("=")).toLowerCase()] = j.substring(j.indexOf("=") + 1, j.length);
+      }
+      var returnValue = paraObj[paras.toLowerCase()];
+      return returnValue;
+    },
+
+    /**
+     * 通过name删除本地cookie
+     * @param name		cookie名
+     */
+    delCookie: function delCookie(name) {
+      document.cookie = name + "=;expires=" + new Date(0).toGMTString();
+    },
+
+    /**+122 qw
+     * 通过name获取本地cookie
+     * @param objName	cookie名
+     */
+    getCookie: function getCookie(objName) {
+      var arrStr = document.cookie.split("; ");
+      for (var i = 0; i < arrStr.length; i++) {
+        var temp = arrStr[i].split("=");
+        if (temp[0] == objName) return unescape(temp[1]);
+      }
+    },
+
+    /**
+     * 设置本地cookie
+     * @param name		cookie名
+     * @param value		cookie值
+     * @param day		cookie保存天数
+     */
+    setCookie: function setCookie(name, value, day) {
+      if (day == null || day == "" || day == undefined) day = 30;
+      var exp = new Date();
+      exp.setTime(exp.getTime() + day * 24 * 60 * 60 * 1000);
+      document.cookie = name + "=" + escape(value) + ";expires=" + exp.toGMTString();
+    },
+
+    /**
+     * 获取浏览器信息
+     * 取值方式versions.isType(*) == true/false
+     */
+    versions: function () {
+      var u = navigator.userAgent,
+        app = navigator.appVersion;
+      return { //移动终端浏览器版本信息
+        isTrident: u.indexOf('Trident') > -1, //IE内核
+        isPresto: u.indexOf('Presto') > -1, //opera内核
+        isWebKit: u.indexOf('AppleWebKit') > -1, //苹果、谷歌内核
+        isGecko: u.indexOf('Gecko') > -1 && u.indexOf('KHTML') == -1, //火狐内核
+        isMobile: !!u.match(/AppleWebKit.*Mobile.*/), //是否为移动终端
+        isIos: !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/), //ios终端
+        isAndroid: u.indexOf('Android') > -1 || u.indexOf('Linux') > -1, //android终端或uc浏览器
+        isIPhone: u.indexOf('iPhone') > -1, //是否为iPhone或者QQHD浏览器
+        isIPad: u.indexOf('iPad') > -1, //是否iPad
+        isWnl: u.indexOf('wnl') > -1, //是否万年历
+        isWebApp: u.indexOf('Safari') == -1, //是否web应该程序，没有头部与底部
+        isWeiXin: u.match(/MicroMessenger/i) == 'MicroMessenger' || u.match(/MicroMessenger/i) == 'micromessenger' //微信浏览器
+      };
+    }(),
+    language: (navigator.browserLanguage || navigator.language).toLowerCase()
+  };
+
+  function getAjaxSign(params) {
+    var _timestamp = Math.round(new Date().getTime() / 1000);
+
+    var arr = [];
+
+    var str = '';
+
+    if (Base.isNull(params)) {
+      params = {};
+    }
+
+    params.uuid = 0;
+    params.deviceID = 'wap deviceID';
+    params.deviceType = '1';
+    params.timestemp = _timestamp;
+
+    $.each(params, function (key, value) {
+      arr.push(key);
+    });
+
+    arr = arr.sort();
+
+    for (var i = 0; i < arr.length; i++) {
+      var _tmp = arr[i] + '=' + params[arr[i]] + '&';
+      str += _tmp;
+    }
+
+    str += 'key=lottery@213cbs!';
+
+    params.sign = md5(str);
+
+    return params;
+
+  }
+
+</script>
+<script>
+
+  $(function(){
+
+    var params = Base.getParmar("orderNo");
+    var orderNo = params.split(',')[0];
+    var source = 'wap';
+    //默认微信回调
+    var payType = 2;
+
+    if(params.length == 1){
+      source = 'wap';
+    }else{
+      source = params.split(',')[1];
+    }
+
+    if(Base.isNull(source)){
+      source = 'wap';
+    }
+
+    //手机内核
+    if(Base.versions.isMobile){
+
+        if(Base.versions.isAndroid){
+            //安卓内核
+
+          $(".msg1").show(0);
+
+//          setTimeout(function(){
+//            window.location.href = 'http://mp.bombsport.com/ticket/#/payResult?paymentNo=' + orderNo + '&payType='+ payType;
+//          },100)
+
+//          var _sign = getAjaxSign({
+//            orderNo: orderNo,
+//            queryType: payType,
+//            source: source
+//          });
+//
+//          $.ajax({
+//            type: "post",
+//            url: 'http://s.bombsport.com/p/payResultQuery ',
+//            data: { orderNo: _sign.orderNo, queryType: _sign.queryType, uuid: _sign.uuid, deviceID: _sign.deviceID, source: _sign.source, deviceType: _sign.deviceType, sign: _sign.sign, timestemp: _sign.timestemp },
+//            dataType: "json",
+//            success: function(data) {
+//
+//            alert(JSON.stringify(data));
+//
+//              if (data.status == 1) {
+//                alert('支付成功');
+//                window.location.href = 'http://mp.bombsport.com/ticket/#/PaySuccess';
+//              } else {
+//                window.location.href = 'http://mp.bombsport.com/ticket/#/PayFail';
+//              }
+//            }
+//
+//          });
+
+        }else{
+            //苹果内核
+
+          if(Base.versions.isWnl){
+            //万年历内
+
+            //->前往下单完成页面
+
+            $(".msg1").show(0);
+
+            //微信支付异步延迟
+//            setTimeout(function(){
+//              window.location.href = 'http://mp.bombsport.com/ticket/#/payResult?paymentNo=' + orderNo + '&payType='+ payType;
+//            },100)
+
+          }else{
+            //其他渠道(包括safari)
+
+            $(".msg2").show(0);
+
+            //显示支付已完成即可
+
+          }
+
+        }
+    }
+
+    $(".toPay, .donePay").click(function () {
+      //查询支付结果
+          setTimeout(function(){
+            window.location.href = 'https://mp.bombsport.com/ticket/#/payResult?paymentNo=' + orderNo + '&payType='+ payType;
+          },100)
+
+    })
+
+
+
+    //微信支付回调
+
+    // 1、万年历渠道
+
+    // a: safari 浏览器
+    // -> 提示订单下单完成
+
+    // b: IOS万年历应用内
+    // -> 返回订单下单完成 -> 结果页
+
+    // c:其他浏览器(正常回调)
+    // -> 返回应用的结果页
+
+    //d: 其他浏览器(回调失败)
+    // -> 提示订单下单完成
+
+    //e: 安卓应用内
+    // -> 返回应用的结果页(暂未发现回调失败的情况)
+
+    // 2、其他渠道
+
+    // 3、自运营渠道
+
+    // a: wap版
+    // -> 返回正常
+
+    // b: 微信版
+    // -> 无需回调
+
+    // c:应用内
+    // 不启用回调，弹出支付完成询问弹窗，再次查询订单
+
+      //返回至payResult
+
+//    alert(orderNo + '       ' + payType);
+
+    //微信支付异步延迟
+//    setTimeout(function(){
+//      window.location.href = 'http://mp.bombsport.com/ticket/#/payResult?paymentNo=' + orderNo + '&payType='+ payType;
+//    },1000)
+
+//    //- 2018年2月26日11:38:50
+//    //- 返回至payResult判断，启用以前的逻辑
+//
+//    return false;
+
+
+
+//
+//    alert(JSON.stringify({ orderNo: _sign.orderNo, queryType: _sign.queryType, uuid: _sign.uuid, deviceID: _sign.deviceID, source: _sign.source, deviceType: _sign.deviceType, sign: _sign.sign, timestemp: _sign.timestemp }));
+
+
+  })
+
+
+</script>
+
+</body>
+</html>

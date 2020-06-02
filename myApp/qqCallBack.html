@@ -1,0 +1,286 @@
+<html>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	    <title> 登录跳转中 </title>
+   </head>
+   <body>
+
+   </body>
+
+   <script type="text/javascript" src="http://mp.bombsport.com/source/js/jquery2.1.4.js"></script>
+   <script type="text/javascript" src="http://mp.bombsport.com/source/js/md5.js"></script>
+   <script type="text/javascript" src="http://qzonestyle.gtimg.cn/qzone/openapi/qc_loader.js" charset="utf-8" data-callback="true"></script>
+
+   <script>
+
+     var base = {
+
+       /**
+        * 通过key获取浏览器的参数
+        * @param paras 	参数名
+        * @param _url		浏览器地址（可选参数）
+        * @returns {*}	参数值
+        */
+       getParmar: function getParmar(paras, _url) {
+         var url = location.href;
+         if (_url) url = _url;
+         var paraString = url.substring(url.indexOf("?") + 1, url.length).split("&");
+         var paraObj = {};
+         for (var i = 0, j = 0; j = paraString[i]; i++) {
+           paraObj[j.substring(0, j.indexOf("=")).toLowerCase()] = j.substring(j.indexOf("=") + 1, j.length);
+         }
+         var returnValue = paraObj[paras.toLowerCase()];
+
+         return returnValue;
+       },
+
+       /**
+        * 通过name删除本地cookie
+        * @param name		cookie名
+        */
+       delCookie: function delCookie(name) {
+         document.cookie = name + "=;expires=" + new Date(0).toGMTString();
+       },
+
+       /**
+        * 通过name获取本地cookie
+        * @param objName	cookie名
+        */
+       getCookie: function getCookie(objName) {
+         var arrStr = document.cookie.split("; ");
+         for (var i = 0; i < arrStr.length; i++) {
+           var temp = arrStr[i].split("=");
+           if (temp[0] == objName) return unescape(temp[1]);
+         }
+       },
+
+       /**
+        * 设置本地cookie
+        * @param name		cookie名
+        * @param value		cookie值
+        * @param day		cookie保存天数
+        */
+       setCookie: function setCookie(name, value, day) {
+         if (day == null || day == "" || day == undefined) day = 30;
+         var exp = new Date();
+         exp.setTime(exp.getTime() + day * 24 * 60 * 60 * 1000);
+         document.cookie = name + "=" + escape(value) + ";expires=" + exp.toGMTString();
+       },
+
+       /**
+        * 生成一个UUID
+        * @returns {string}
+        */
+       getUuid: function getUuid() {
+         var len = 32; //32长度
+         var radix = 16; //16进制
+         var chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'.split('');var uuid = [],
+           i;radix = radix || chars.length;if (len) {
+           for (i = 0; i < len; i++) {
+             uuid[i] = chars[0 | Math.random() * radix];
+           }
+         } else {
+           var r;uuid[8] = uuid[13] = uuid[18] = uuid[23] = '-';uuid[14] = '4';for (i = 0; i < 36; i++) {
+             if (!uuid[i]) {
+               r = 0 | Math.random() * 16;uuid[i] = chars[i == 19 ? r & 0x3 | 0x8 : r];
+             }
+           }
+         }
+         return uuid.join('');
+       },
+
+       /**
+        * unicode转码
+        * @param str
+        * @returns {string}
+        */
+       encodeUnicode: function encodeUnicode(str) {
+         var res = [];
+         for (var i = 0; i < str.length; i++) {
+           res[i] = ("00" + str.charCodeAt(i).toString(16)).slice(-4);
+         }
+         return "\\u" + res.join("\\u");
+       },
+
+       /**
+        * unicode解码
+        * @param str
+        */
+       decodeUnicode: function decodeUnicode(str) {
+         str = str.replace(/\\/g, "%");
+         return unescape(str);
+       },
+
+       /**
+        * 判断一个值是否为空
+        * @param obj			任意类型
+        * @returns {boolean}	是否为空
+        */
+       isNull: function isNull(obj) {
+         if (obj == undefined || obj == 'undefined' || obj == null || obj == 'null' || obj == "" || obj.length == 0) return true;else return false;
+       },
+
+       /**
+        * 获取浏览器信息
+        * 取值方式versions.isType(*) == true/false
+        */
+       versions: function () {
+         var u = navigator.userAgent,
+           app = navigator.appVersion;
+         return { //移动终端浏览器版本信息
+           isTrident: u.indexOf('Trident') > -1, //IE内核
+           isPresto: u.indexOf('Presto') > -1, //opera内核
+           isWebKit: u.indexOf('AppleWebKit') > -1, //苹果、谷歌内核
+           isGecko: u.indexOf('Gecko') > -1 && u.indexOf('KHTML') == -1, //火狐内核
+           isMobile: !!u.match(/AppleWebKit.*Mobile.*/), //是否为移动终端
+           isIos: !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/), //ios终端
+           isAndroid: u.indexOf('Android') > -1 || u.indexOf('Linux') > -1, //android终端或uc浏览器
+           isIPhone: u.indexOf('iPhone') > -1, //是否为iPhone或者QQHD浏览器
+           isIPad: u.indexOf('iPad') > -1, //是否iPad
+           isWebApp: u.indexOf('Safari') == -1, //是否web应该程序，没有头部与底部
+           isWeiXin: u.match(/MicroMessenger/i) == 'MicroMessenger' || u.match(/MicroMessenger/i) == 'micromessenger', //微信浏览器
+           isIosApp : u.indexOf('ticket_ios') > -1, //ios客户端版本
+           isAndroidApp : u.indexOf('ticket_android') > -1 //安卓客户端版本
+         };
+       }(),
+       language: (navigator.browserLanguage || navigator.language).toLowerCase()
+     };
+
+     function getAjaxSign(params) {
+       var _timestamp = Math.round(new Date().getTime() / 1000);
+
+       var arr = [];
+
+       var str = '';
+
+       if (base.isNull(params)) {
+         params = {};
+       }
+
+       var deviceID = base.getCookie('deviceID');
+
+       if (base.isNull(deviceID)) {
+         deviceID = base.getUuid();
+         base.setCookie('deviceID', deviceID, 365);
+       }
+
+       var source = base.getParmar('source');
+
+       if(base.isNull(source)){
+         source = base.getCookie('source')
+         if(base.isNull(source)){
+           source = localStorage.getItem('source')
+         }
+         if(base.isNull(source)){
+           //没有渠道号
+           source = 'wap'
+         }
+
+       }else{
+         //有渠道号
+         var _source = base.getCookie('source')
+         if(base.isNull(_source)){
+           _source = localStorage.getItem('source')
+         }
+         if(base.isNull(_source)){
+           //第一次登录
+           base.setCookie('source', source)
+           localStorage.setItem('source', source)
+         }
+       }
+
+       params.uuid = 0;
+       params.deviceID = deviceID;
+       params.source = source;
+       params.deviceType = '1';
+       params.timestemp = _timestamp;
+
+       $.each(params, function (key, value) {
+         arr.push(key);
+       });
+
+       arr = arr.sort();
+
+       for (var i = 0; i < arr.length; i++) {
+         var _tmp = arr[i] + '=' + params[arr[i]] + '&';
+         str += _tmp;
+       }
+
+       str += 'key=lottery@213cbs!';
+
+       params.sign = md5(str);
+
+       return params;
+     }
+
+     $(function(){
+
+       var source = base.getParmar('source');
+
+       if(base.isNull(source)){
+         source = base.getCookie('source')
+         if(base.isNull(source)){
+           source = localStorage.getItem('source')
+         }
+         if(base.isNull(source)){
+           //没有渠道号
+           source = 'wap'
+         }
+
+       }else{
+         //有渠道号
+         var _source = base.getCookie('source')
+         if(base.isNull(_source)){
+           _source = localStorage.getItem('source')
+         }
+         if(base.isNull(_source)){
+           //第一次登录
+           base.setCookie('source', source)
+           localStorage.setItem('source', source)
+         }
+       }
+
+       QC.Login.getMe(function(openId, accessToken){
+         var _sign = this.getAjaxSign({
+           token: accessToken,
+           key: 101461073,
+           openid: openId
+         });
+         $.ajax({
+           type: "post",
+           url: 'https://s.bombsport.com:4432/user/webQQLoginIn',
+           data: { token: _sign.token, key: _sign.key, openid: _sign.openid, uuid: _sign.uuid, deviceID: _sign.deviceID, source: _sign.source, deviceType: _sign.deviceType, sign: _sign.sign, timestemp: _sign.timestemp },
+           dataType: "json",
+           success: function(data) {
+               if(data.status == 1){
+                 window.localStorage.setItem('userInfo', JSON.stringify(data.returnJSON));
+                 base.setCookie('userInfo', JSON.stringify(data.returnJSON));
+
+                 //跳转至回调页
+                 //登录成功
+                 //重定向至渠道版
+                 window.location.href = 'https://mp.bombsport.com/ticket/main.html?source=' + source;
+
+               }else{
+                 alert('登录失败，请稍后再试')
+               }
+           },
+           error: function(e) {
+               alert('登录失败，请稍后再试')
+           }
+         });
+
+       })
+
+
+
+     })
+
+
+
+   </script>
+
+
+</html>
+
+

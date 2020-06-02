@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="pragma" content="no-cache">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta content="telephone=no,email=no" name="format-detection" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no"/>
+
+    <!-- 7E css -->
+    <link rel="stylesheet" href="../css/base.css">
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/loading.css">
+    <!-- Element-UI css -->
+    <link rel="stylesheet" href="../css/element-ui@1.2.4.css">
+    <!-- 7E js -->
+    <script src="../js/jquery-2.1.4.js"></script>
+    <script src="../js/vue.js"></script>
+    <!-- Element-UI js -->
+    <script src="../js/element-ui@1.2.4.js"></script>
+    <script src="../layer/layer.js"></script>
+    <script src="../js/vue-component.js"></script>
+    <script src="../js/base.js"></script>
+    <script src="../js/interface.js"></script>
+    <script src="../js/md5.js"></script>
+    <script src="../js/sha1.js"></script>
+    <script src="../js/sign.js"></script>
+    <!--<script src="js/checkLogin.js"></script>-->
+    <script src="../js/loading.js"></script>
+    <title>我的</title>
+</head>
+<body>
+
+<!--
+| ------------------------------------------
+| user_page
+| ------------------------------------------
+| Here are user_page html
+|
+-->
+<div id="user_page">
+
+    <div class="loader">
+        <div class="loader-content">
+            <img src="../images/loading.gif" alt="Loader" class="loader-loader" />
+        </div>
+    </div>
+
+    <div class="wb100">
+
+    </div>
+
+
+</div>
+
+<script>
+
+    window.apiready = function(){
+        var vm = new Vue({
+            el: "#user_page",
+            data: {
+                user: {},
+            },
+            created: function created() {
+
+
+                var moviePlayer = api.require('moviePlayer');
+                moviePlayer.open({
+                    rect:{
+                        x: 0,
+                        y: 0,
+                        w:api.frameWidth,
+                        h:300
+                    },
+                    styles:{
+                        head:{
+                            bg: 'rgba(161,161,161,0.5)',
+                            height: 44,
+                            y:20,
+                            title:{
+                                size:20,
+                                color:'#fff',
+                                width:40,
+                                leftMargin:10
+                            },
+                            backSize: 30,
+                            backImg:'widget://image/back.png',
+                            customButtons:[{
+                                w:30,
+                                h:30,
+                                rightMagin:10,
+                                img:'widget://image/image/collect.png',
+                                imgSelected:'fs://image/collectSelected.png',
+                            }]},
+                        foot:{
+                            bg: 'rgba(0,0,0,0.5)',
+                            height: 44,
+                            palyBtn:{
+                                size: 20,
+                                playImg:'widget://image/play.png',
+                                pauseImg:'widget://image/pause.png',
+                                marginLeft:5
+                            },
+                            currentTimeLabel:{
+                                textSize:14,
+                                textColor:"#FFF",
+                                textWidth: 43,
+                                marginLeft:5
+                            },
+                            seekBar:{
+                                sliderImg:'widget://image/circle.png',
+                                sliderW : 20,
+                                sliderH : 20,
+                                progressColor: '#696969',
+                                progressSelected: '#76EE00',
+                                marginLeft:10,
+                                marginRight:10
+                            },
+                            totalTimeLabel:{
+                                textSize:14,
+                                textColor:"#FFF",
+                                textWidth: 43,
+                                marginRight:5
+                            },
+                            fullscreenBtn:{
+                                size:20,
+                                verticalImg:'widget://image/vertical.png',
+                                horizontalImg:'widget://image/horizontal.png',
+                            }
+                        } },
+                    path:'http://resource.apicloud.com/video/apicloud3.mp4',
+                    autoPlay: true
+                },function(ret, err){
+                    if(ret){
+                        // alert(JSON.stringify(ret));
+                        // } else {
+                        // alert(JSON.stringify(err));
+                    }
+
+                });
+
+            }
+        });
+    }
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="pragma" content="no-cache">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta content="telephone=no,email=no" name="format-detection" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no"/>
+    <title>头像</title>
+    <!--css-->
+    <link rel="stylesheet" href="../css/loading.css">
+    <link rel="stylesheet" href="../css/common.css">
+    <link rel="stylesheet" href="../css/payment-popup.css">
+
+    <!--js-->
+    <script src="../js/jquery-2.1.4.js"></script>
+    <script src="../js/loading.js"></script>
+    <script src="../js/vue.js"></script>
+    <script src="../js/interface.js?v=24"></script>
+    <script src="../js/base.js"></script>
+    <script src="../js/md5_ch.js"></script>
+    <style>
+        .head-list{
+            padding: 10px 15px;
+            font-size:0;
+        }
+        .head-list ul li{
+            display: inline-block;
+            margin-right: 6%;
+            margin-bottom: 10px;
+            width: 47%;
+            height:145px;
+        }
+        .head-list ul li img{
+            width: 100%;
+            height:100%;
+        }
+        .head-list ul li:nth-of-type(2n){
+            margin-right: 0;
+        }
+        .no-more{
+            padding:10px 0;
+            font-size:1.2rem;
+            text-align: center;
+        }
+        /*弹出层相关样式重置*/
+        .layui-layer{
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        .layui-layer-title{
+            padding: 5px 0 !important;
+        }
+        .layui-layer-content{
+            padding-top: 20px !important;
+            height:auto !important;
+        }
+        .layui-layer-btn{
+            margin-top: 10px;
+            text-align: center;
+        }
+        .layui-layer-btn a{
+            display: inline-block;
+            padding:5px 15px;
+            font-size:1.2rem;
+            color: #FFFFFF;
+            background: #1BD5FF !important;
+            border-radius: 5px;
+            border:none;
+        }
+        .layui-layer-btn .layui-layer-btn0{
+            margin-right: 40px;
+        }
+    </style>
+</head>
+<body>
+    <div id="head_page">
+
+        <div class="loader">
+            <div class="loader-content">
+                <img src="../images/loading.gif" alt="Loader" class="loader-loader" />
+            </div>
+        </div>
+
+        <div class="header">
+            <span class="back" @click="goBack"><img src="../images/back.png" alt="后退"></span>
+            <span class="title">头像</span>
+        </div>
+
+        <div class="head-list">
+            <ul>
+                <li v-for="var (val,index) in data"><img :src="val.icon"></li>
+            </ul>
+            <p v-if="moreData" class="no-more">暂无更多数据</p>
+        </div>
+
+    </div>
+
+    <script>
+        "use strict";
+
+
+        window.apiready = function() {
+
+            var vm = new Vue({
+                el: "#head_page",
+                data: {
+                    p: 1,
+                    data: [],
+                    total: "",
+                    moreData: false
+                },
+                methods: {
+                    goBack: function () {
+                        api.closeWin();
+                    }
+
+//                @click="save(val.icon)"
+//                save:function (icon) {
+//                    layer.open({
+//                        closeBtn:0,
+//                        btn: ['确定', '取消'],
+//                        title: ['提示', 'text-align:center;padding:20px 0 20px 0;font-size:1.4rem;font-weight:400;color:#ffffff;background:#1AD5FF'],
+//                        content: '<p style="font-size: 1.2rem;text-align: center">保存图片到本地？</p>',
+//                        area: ['83%','auto'],
+//                        yes: function(index, layero){
+//                            alert(icon);
+//                        },
+//                        btn2:function () {
+//                            //return false 开启该代码可禁止点击该按钮关闭
+//                        }
+//                    });
+//                }
+                },
+                created: function () {
+                    var _this = this;
+                    //获取头像列表
+                    baseAjax.getHeadList(_this.p, function (res) {
+                        _this.data = res.data;
+                        _this.total = res.total;
+                        _this.p++;
+                    });
+                    //滚动到底部加载数据
+                    $(window).scroll(function () {
+                        var scrollTop = $(this).scrollTop();
+                        var windowHeight = $(this).height();
+                        var scrollHright = $(document).height();
+                        if (scrollHright - (scrollTop + windowHeight) < 2) {
+                            if (_this.p > _this.total) {
+                                _this.moreData = true;
+                                return false
+                            }
+                            baseAjax.getHeadList(_this.p, function (res) {
+                                _this.data = _this.data.concat(res.data);
+                                _this.p++;
+                            });
+                        }
+                    });
+                }
+            })
+        }
+    </script>
+</body>
+</html>

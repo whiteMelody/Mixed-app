@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="pragma" content="no-cache">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta content="telephone=no,email=no" name="format-detection" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no"/>
+
+    <!-- 7E css -->
+    <link rel="stylesheet" href="../css/base.css">
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/loading.css">
+    <!-- Element-UI css -->
+    <link rel="stylesheet" href="../css/element-ui@1.2.4.css">
+    <!-- 7E js -->
+    <script src="../js/jquery-2.1.4.js"></script>
+    <script src="../js/vue.js"></script>
+    <!-- Element-UI js -->
+    <script src="../js/element-ui@1.2.4.js"></script>
+    <script src="../js/vue-component.js"></script>
+    <script src="../js/base.js"></script>
+    <script src="../js/interface.js"></script>
+    <script src="../js/md5.js"></script>
+    <script src="../js/sign.js"></script>
+    <script src="../js/loading.js"></script>
+    <!--<script src="js/checkLogin.js"></script>-->
+
+    <title>搜索</title>
+</head>
+<body>
+
+<!--
+| ------------------------------------------
+| search_page
+| ------------------------------------------
+| Here are search_page html
+|
+-->
+<div id="search_page">
+
+    <div class="loader">
+        <div class="loader-content">
+            <img src="../images/loading.gif" alt="Loader" class="loader-loader" />
+        </div>
+    </div>
+    <!--<layout-loader :show="showLoader"></layout-loader>-->
+
+    <div class="wb100">
+        <div class="pa15">
+            <div class="wb100 h45px lh45px warpper-blue radius5 text-center" @click="open">
+                打开百度地图
+            </div>
+        </div>
+
+        <div class="clear1"></div>
+
+        <div class="pa15">
+            <div class="wb100 h45px lh45px warpper-blue radius5 text-center" @click="getLocation">
+                定位
+            </div>
+        </div>
+
+        <div class="clear1"></div>
+
+        <div class="pa15">
+            <div class="wb100 h45px lh45px warpper-blue radius5 text-center" @click="getLocationServices">
+                获取是否开启定位权限
+            </div>
+        </div>
+
+        <div class="clear1"></div>
+
+        <div class="pa15">
+            <div class="wb100 h45px lh45px warpper-blue radius5 text-center" @click="openBaiduMap">
+                在百度地图中打开
+            </div>
+        </div>
+
+
+        <div class="clear" style="height: 1000px;"></div>
+
+    </div>
+
+
+</div>
+
+
+<script>
+
+    'use strict';
+
+    window.apiready = function() {
+
+        var vm = new Vue({
+            el: "#search_page",
+            data: {
+                showLoader: true,
+                bMap: {},
+            },
+            methods: {
+                myBack: function myBack() {
+                    api.closeWin();
+                },
+
+                getLocationServices: function getLocationServices() {
+                    this.bMap.getLocationServices(function(ret, err) {
+                        if (ret.enable) {
+                            alert(JSON.stringify(ret));
+                        } else {
+                            alert("未开启定位功能！");
+                        }
+                    });
+                },
+
+                getLocation: function getLocation() {
+                    this.bMap.getLocation({
+                        accuracy: '100m',
+                        autoStop: true,
+                        filter: 1
+                    }, function(ret, err) {
+                        if (ret.status) {
+                            alert(JSON.stringify(ret));
+                        } else {
+                            alert(err.code);
+                        }
+                    });
+                },
+
+                open: function open() {
+                    var _this = this;
+
+
+                            _this.bMap.getLocation({
+                                accuracy: '100m',
+                                autoStop: true,
+                                filter: 1
+                            }, function (ret, err) {
+                                if (ret.status) {
+
+//                                    _this.bMap.setShowMapPoi({
+//                                        showMapPoi: false
+//                                    });
+
+
+                                    _this.bMap.open({
+                                        rect: {
+                                            x: 0,
+                                            y: 0,
+                                            w: 'auto',
+                                            h: 300
+                                        },
+                                        center: {
+                                            lon: ret.lon,
+                                            lat: ret.lat
+                                        },
+                                        zoomLevel: 18,
+                                        showUserLocation: true,
+                                        fixedOn: api.frameName,
+                                        fixed: true
+                                    }, function (ret) {
+                                        if (ret.status) {
+
+                                            _this.bMap.setBuilding({
+                                                building: true
+                                            });
+
+                                            _this.bMap.setOverlook({
+                                                degree: -45
+                                            });
+
+                                            //加载标注
+                                            _this.bMap.addAnnotations({
+                                                annotations: [{
+                                                    id: 1,                     //数字类型；图标标注的唯一标识
+                                                    lon: 116.233,              //数字类型；图标标注所在位置的经度
+                                                    lat: 39.134,               //数字类型；图标标注所在位置的纬度
+                                                    icon: 'widget://images/icon-logo.png',         //（可选项）字符串类型；指定的标注图标，要求本地路径（fs://、widget://），若不传则显示公用的 icon 图标
+                                                    draggable: true            //（可选项）布尔类型；所添加的标注是否可被拖动，若不传则以公用的 draggable 为准
+                                                }],
+                                            }, function (ret) {
+                                                if (ret) {
+                                                    alert(ret.id);
+                                                }
+                                            });
+
+
+                                            //搜索路径
+                                            _this.bMap.searchRoute({
+                                                type: 'drive',
+                                                policy: 'ecar_fee_first',
+                                                start: {
+                                                    lon: 116.403838,
+                                                    lat: 39.914437
+                                                },
+                                                end: {
+                                                    lon: 116.384852,
+                                                    lat: 39.989576
+                                                }
+                                            }, function(ret, err) {
+                                                if (ret.status) {
+                                                    _this.bMap.drawRoute({
+                                                        id: 1,
+                                                        autoresizing: false,
+                                                        index: 0,
+                                                        styles: {
+                                                            start: {
+                                                                icon: 'widget://images/icon-logo.png',
+                                                            },
+                                                            end: {
+                                                                icon: 'widget://images/icon-logo.png',
+                                                            }
+                                                        }
+                                                    }, function(ret) {
+                                                        api.alert({ msg: JSON.stringify(ret) });
+                                                    });
+                                                } else {
+                                                    api.alert({ msg: JSON.stringify(err) });
+                                                }
+                                            });
+
+                                        }
+
+                                    });
+
+
+                                } else {
+                                    alert(err.code);
+                                }
+                            });
+
+
+                },
+
+                addBillboard: function addBillboard() {
+                    this.bMap.addBillboard({
+                        id: 4,
+                        coords: {
+                            lon: 116.233,
+                            lat: 39.134
+                        },
+                        bgImg:  'widget://',
+                        //                            bgImg: 'widget://image/icon-logo.png',
+                        content: {
+                            title: '大标题大标题大标题大标题',
+                            subTitle: '概述内容概述内容概述内容',
+                            illus: 'http://ico.ooopic.com/ajax/iconpng/?id=145044.png'
+                        },
+                        styles: {
+                            titleColor: '#000',
+                            titleSize: 16,
+                            subTitleColor: '#999',
+                            subTitleSize: 12,
+                            illusAlign: 'left'
+                        }
+                    }, function(ret) {
+                        if (ret) {
+                            alert(JSON.stringify(ret));
+                        }
+                    });
+                },
+
+                openBaiduMap: function openBaiduMap() {
+                    api.openApp({
+                        androidPkg: 'android.intent.action.VIEW' ,
+                        appParam:{
+                            origin:'中关村',
+                            destination:'五道口',
+                            region:'北京',
+                            mode:'driving',
+                            src:api.appName
+                        },
+                        uri:'intent://map/direction?origin=中关村&destination=五道口&mode=driving&region=北京&src=osm#Intent;scheme=bdapp;package=com.baidu.BaiduMap;end',
+                        iosUrl:'baidumap://map/direction'
+                    },function(ret,err){
+
+                    });
+                }
+            },
+            created: function created() {
+                this.bMap = api.require('bMap');
+
+
+
+                //移除指定ID的标注/布告牌
+//                map.removeAnnotations({
+//                    ids: [1,3,5,7]
+//                });
+            }
+        });
+
+    }
+
+</script>
+
+</body>
+</html>

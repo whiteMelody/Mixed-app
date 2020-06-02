@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="pragma" content="no-cache">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta content="telephone=no,email=no" name="format-detection" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no"/>
+    <title>刷赞神器</title>
+    <!--css-->
+    <link rel="stylesheet" href="css/loading.css">
+    <link rel="stylesheet" href="css/common.css">
+    <link rel="stylesheet" href="css/about.css">
+    <link rel="stylesheet" href="css/payment-popup.css">
+    <!--js-->
+    <script src="js/jquery-2.1.4.js"></script>
+    <script src="js/loading.js"></script>
+    <script src="js/vue.js"></script>
+    <script src="js/interface.js?v=24"></script>
+    <script src="js/base.js"></script>
+    <script src="js/md5_ch.js"></script>
+    <style>
+        .input{
+            padding:14px 15px;
+        }
+        .input input{
+            width: 100%;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div id="space_page">
+
+        <div class="loader">
+            <div class="loader-content">
+                <img src="images/loading.gif" alt="Loader" class="loader-loader" />
+            </div>
+        </div>
+
+        <div class="header">
+            <span class="back" @click="goBack"><img src="images/back.png" alt="后退"></span>
+            <span class="title">{{type_name}}</span>
+        </div>
+
+        <div class="input">
+            <input type="text" placeholder="输入QQ号" class="qq" v-model="qq">
+        </div>
+
+        <div class="frequency">
+            <ul>
+                <li class="item" v-for="var (val,index2) in data" @click="index = index2" :class="index2 == index ? 'active' : ''">
+                    <p class="time">{{val.zan_num}}次</p>
+                    <p class="price">￥{{(val.score_num / 1000).toFixed(2)}}</p>
+                </li>
+            </ul>
+        </div>
+
+        <div class="danger clearfix" v-if="type_id == 2 || type_id == 16">
+            <p class="content">{{result.notice}}</p>
+        </div>
+
+        <div class="bottom" @click="order">立即支付</div>
+        <div class="tips fs20" v-if="type_id == 3 || type_id == 7 || type_id == 16">为了防止被屏蔽，此任务需要24小时左右的时间，请耐心等候</div>
+
+        <transition name="fade">
+            <div class="alert-tips" v-if="show">请正确填写QQ号</div>
+        </transition>
+
+        <div class="mengceng" @click="closeGray"></div>
+
+        <div class="selectPay">
+            <div @click="weixinPay">
+                <span><img src="images/weixin.png" alt="微信支付"></span>
+                <span class="text">微信支付</span>
+            </div>
+            <div @click="zhifubaoPay">
+                <span><img src="images/zhifubao.png" alt="支付宝支付"></span>
+                <span class="text">支付宝支付</span>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        "use strict";
+
+
+        window.apiready = function() {
+
+            var vm = new Vue({
+                el: "#space_page",
+                data: {
+                    type_id: "",
+                    type_name: "",
+                    index: 0,
+                    qq: "",
+                    data: [],
+                    result: "",
+                    num: "",
+                    show: false,
+                    btn: []
+                },
+                methods: {
+                    goBack: function () {
+                        api.closeWin();
+                    },
+                    closeGray: function () {
+                        $(".mengceng").removeClass("mengcengActive");
+                        $(".selectPay").removeClass("closeActive");
+                    },
+                    weixinPay: function () {
+                        var _this = this;
+                        pay.payFunction(_this.type_id, '2', _this.qq, "", _this.data[_this.index].zan_num);
+                        $(".mengceng").removeClass("mengcengActive");
+                        $(".selectPay").removeClass("closeActive");
+                    },
+                    zhifubaoPay: function () {
+                        var _this = this;
+                        pay.payFunction(_this.type_id, '1', _this.qq, "", _this.data[_this.index].zan_num);
+                        $(".mengceng").removeClass("mengcengActive");
+                        $(".selectPay").removeClass("closeActive");
+                    },
+                    order: function () {
+                        var _this = this;
+                        //判断qq输入是否正确
+                        if (_this.qq == "" || isNaN(parseInt(_this.qq))) {
+                            _this.show = true;
+                            if (_this.show) {
+                                var timer1 = setTimeout(function () {
+                                    _this.show = false;
+                                }, 2000)
+                            }
+                            return false
+                        }
+
+                        //如果是微信或者QQ内部打开，直接用微信去支付
+                        if (base.versions.isQQ) {
+                            pay.payFunction(_this.type_id, '2', _this.qq, "", _this.data[_this.index].zan_num);
+                        } else {
+                            _this.mengceng = true;
+                            $(".mengceng").addClass("mengcengActive");
+                            $(".selectPay").addClass("closeActive");
+                        }
+                    }
+                },
+                created: function () {
+                    var _this = this;
+                    _this.type_id = api.pageParam.type_id;
+                    _this.type_name = decodeURI(api.pageParam.type_name);
+                    //获取刷名片赞次数价格信息
+                    baseAjax.goVisit(_this.type_id, function (res) {
+                        _this.result = res;
+                        _this.data = res.data;
+                    });
+                }
+            })
+
+        }
+    </script>
+</body>
+</html>

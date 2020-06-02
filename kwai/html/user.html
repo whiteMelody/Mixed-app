@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta content="telephone=no,email=no" name="format-detection" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no"/>
+
+    <!-- 7E css -->
+    <link rel="stylesheet" href="../css/base.css">
+    <link rel="stylesheet" href="../css/style.css">
+
+    <title>快手刷粉</title>
+</head>
+<body>
+
+<div id="user_page warpper-gray-3">
+
+    <loader :show="fullscreenLoading"></loader>
+
+    <!--<navTitle :title="'个人中心 '" :back="false"></navTitle>-->
+
+    <div class="dialogBg" style="z-index: 99999;" v-show="showService == true" @click="showService = false"></div>
+    <div class="fixed lh50px F14 warpper-white radius5" v-show="showService == true" style="width: 240px; height: 140px;  top: 0; right: 0; left: 0; bottom: 0; margin: auto; z-index: 999999;">
+        <p class="text-center h50px lh50px bor-gray bor-solid-1b Fgray-3 F16">联系客服</p>
+        <div class="clear1"></div>
+        <p class="text-center lh30px Fgray-2">电话/微信：<a href="tel:13310227366"> <span class="Fblue Fnum">13310227366</span> </a></p>
+        <p class="text-center lh30px Fgray-2">工作时间：9:00-18:00</p>
+    </div>
+
+    <div class="wb100 bg-linear1">
+
+        <div class="wb50 fl">
+            <div class="wb100 h50px">
+                <img src="~@/assets/images/icon-service.png" class="h30px absolute"  style="top: 10px; left: 15px;"  @click="showService = true">
+            </div>
+        </div>
+        <div class="wb50 fr">
+            <router-link :to="{ name: 'Login' }">
+                <p class="h50px lh50px par15 Fwhite text-right">切换账户</p>
+            </router-link>
+        </div>
+
+        <div class="clear"></div>
+
+        <div class="w80px h80px center">
+            <img :src="user.head" class="w80px h80px radius50per bor-white bor-solid-3a">
+        </div>
+        <div class="clear1"></div>
+        <div class="text-center wb100 lh25px Fwhite">
+            <p>{{user.nick_name}}</p>
+            <p class="F14 Fnum">ID:{{user.user_id}}</p>
+        </div>
+        <div class="clear1"></div>
+    </div>
+
+    <div class="clear"></div>
+
+    <div class="wb100 warpper-white">
+        <div class="pa15 h30px lh30px">
+            <span class="fl Fblack">我的积分： <span class="Fpink Fnum">{{user.total_score}}</span></span>
+            <router-link :to="{ name: 'Recharge' }">
+                <div class="w70px h30px lh30px text-center bg-linear1 Fwhite F12 radius5 fr">
+                    购买积分
+                </div>
+            </router-link>
+            <div class="clear"></div>
+        </div>
+    </div>
+    <div class="clear1"></div>
+
+    <!--<router-link :to="{ name: 'Earn' }">-->
+    <!--<div class="wb100 warpper-white">-->
+    <!--<div class="pa15 h30px lh30px">-->
+    <!--<span class="fl Fblack">赚取积分</span>-->
+    <!--<span class="fr Fgray-2">-->
+    <!--<img src="~@/assets/images/arrow-right.png" style="height: 16px; margin-top: 8px;" class="fr mal10">-->
+    <!--</span>-->
+    <!--<div class="clear"></div>-->
+    <!--</div>-->
+    <!--</div>-->
+    <!--</router-link>-->
+    <!--<div class="clear1"></div>-->
+
+    <div class="wb100 warpper-white">
+        <div class="pal15 pat15 pab15 h30px lh30px">
+            <div class="par15">
+                <span class="fl Fblack">推作品数</span>
+                <span class="fr Fgray-2">
+            {{user.tui_num}}
+          </span>
+                <div class="clear"></div>
+            </div>
+        </div>
+        <div class="clear bor-gray bor-solid-1b"></div>
+
+        <div class="pal15 pat15 pab15 h30px lh30px">
+            <div class="par15">
+                <span class="fl Fblack">被赞数</span>
+                <span class="fr Fgray-2">
+            {{user.liked_num}}
+          </span>
+                <div class="clear"></div>
+            </div>
+        </div>
+        <div class="clear bor-gray bor-solid-1b"></div>
+
+        <div class="pal15 pat15 pab15 h30px lh30px">
+            <div class="par15">
+                <span class="fl Fblack">被评数</span>
+                <span class="fr Fgray-2">
+            {{user.commented_num}}
+          </span>
+                <div class="clear"></div>
+            </div>
+        </div>
+        <div class="clear bor-gray bor-solid-1b"></div>
+
+        <div class="pal15 pat15 pab15 h30px lh30px">
+            <div class="par15">
+                <span class="fl Fblack">赞他人数</span>
+                <span class="fr Fgray-2">
+            {{user.like_num}}
+          </span>
+                <div class="clear"></div>
+            </div>
+        </div>
+        <div class="clear bor-gray bor-solid-1b"></div>
+
+        <div class="pal15 pat15 pab15 h30px lh30px">
+            <div class="par15">
+                <span class="fl Fblack">评他人数</span>
+                <span class="fr Fgray-2">
+            {{user.comment_num}}
+          </span>
+                <div class="clear"></div>
+            </div>
+        </div>
+        <div class="clear bor-gray bor-solid-1b"></div>
+
+        <div class="pal15 pat15 pab15 h30px lh30px">
+            <div class="par15">
+                <span class="fl Fblack">邀请人数</span>
+                <span class="fr Fgray-2">
+            {{user.invite_num}}
+          </span>
+                <div class="clear"></div>
+            </div>
+        </div>
+        <div class="clear"></div>
+
+    </div>
+
+    <navFooter :active="3"></navFooter>
+
+</div>
+
+<script src="../js/vue.js"></script>
+<script src="../js/base.js"></script>
+<script src="../js/interface.js?v=25"></script>
+<script>
+
+    import Base from '../js/base.js'
+    import Interface from '../js/interface.js'
+
+    var vm = new Vue({
+        el: "#user_page",
+        data: {
+            showService: false,
+            searchType: 0,
+            user: {},
+        },
+        methods: {
+
+        },
+        mounted(){
+
+            Interface.getInfo( (data)=> {
+                if(data){
+                    this.user = data;
+                }else{
+                    this.$router.replace({ name: 'Login' });
+                }
+                this.fullscreenLoading = false;
+            })
+
+        }
+
+    });
+
+</script>
+
+</body>
+</html>

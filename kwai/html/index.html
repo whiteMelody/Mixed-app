@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta content="telephone=no,email=no" name="format-detection" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no"/>
+
+    <!-- 7E css -->
+    <link rel="stylesheet" href="../css/base.css">
+    <link rel="stylesheet" href="../css/style.css">
+
+    <title>快手刷粉</title>
+</head>
+<body>
+
+<div id="index_page">
+
+    <!--<loader :show="fullscreenLoading"></loader>-->
+
+    <!--联系客服弹窗-->
+    <div class="dialogBg" style="z-index: 99999;" v-show="showService == true" @click="showService = false"></div>
+    <div class="fixed lh50px F14 warpper-white radius5" v-show="showService == true" style="width: 240px; height: 140px;  top: 0; right: 0; left: 0; bottom: 0; margin: auto; z-index: 999999;">
+        <p class="text-center h50px lh50px bor-gray bor-solid-1b Fgray-3 F16">联系客服</p>
+        <div class="clear1"></div>
+        <p class="text-center lh30px Fgray-2">电话/微信：<a href="tel:13310227366"> <span class="Fblue Fnum">13310227366</span> </a></p>
+        <p class="text-center lh30px Fgray-2">工作时间：9:00-18:00</p>
+    </div>
+
+    <div class="wb100 bg-linear1 h50px">
+        <div class="relative" style="padding-left:45px; padding-right: 75px;">
+            <img src="~@/assets/images/icon-service.png" class="h30px absolute"  style="top: 10px; left: 15px;"  @click="showService = true">
+            <p class="Fwhite lh50px text-center">云端刷量</p>
+            <router-link :to="{ name: 'Recharge' }">
+                <div class="w60px h30px lh30px text-center radius5 absolute Fwhite bor-white bor-solid-1a F12" style="top: 10px; right: 15px;">
+                    购买积分
+                </div>
+            </router-link>
+        </div>
+    </div>
+
+    <template v-if="width >= 700">
+        <div class="wb100">
+            <template v-for="item in list">
+                <router-link :to="{ name: 'BrushDetail', params: { typeID: item.id }, query: { title: item.name } }">
+                    <div class="wb33333 fl">
+                        <div class="pa15">
+                            <div class="wb50 center radius5 img-area">
+                                <img :src="item.icon">
+                            </div>
+                        </div>
+                    </div>
+                </router-link>
+            </template>
+        </div>
+
+    </template>
+
+    <template v-else>
+        <div class="pa705">
+
+            <template v-for="item in list">
+                <router-link :to="{ name: 'BrushDetail', params: { typeID: item.id }, query: { title: item.name } }">
+                    <div class="wb50 fl">
+                        <div class="pa705">
+                            <div class="wb100 radius5 img-area">
+                                <img :src="item.icon">
+                            </div>
+                        </div>
+                    </div>
+                </router-link>
+            </template>
+
+        </div>
+    </template>
+
+
+    <div class="w100px h40px lh40px text-center bg-linear1 fixed Fwhite F12 radius20 box-shadow2" style="bottom: 85px; left: 15px;" @click="download">
+        下载APP
+    </div>
+
+
+    <router-link :to="{ name: 'Mutual' }">
+        <div class="w100px h40px lh40px text-center bg-linear1 fixed Fwhite F12 radius20 box-shadow2" style="bottom: 85px; right: 15px;">
+            生成互粉链接
+        </div>
+    </router-link>
+
+</div>
+
+<script src="../js/vue.js"></script>
+<script src="../js/base.js"></script>
+<script src="../js/interface.js?v=25"></script>
+<script>
+    "use strict";
+
+    import Base from '../js/base.js'
+    import Interface from '../js/interface.js'
+
+    var vm = new Vue({
+        el: "#index_page",
+        data: {
+            fullscreenLoading: true,
+            showService: false,
+            width: 0,
+            list: [],
+        },
+        methods: {
+            download(){
+                if(Base.versions.isAndroid){
+                    window.location.href = "http://www.7shuiguo.cn/kwai_chuizi_v.1.0.1.apk"
+                }else{
+                    window.location.href = "https://itunes.apple.com/cn/app/k%E6%AD%8C%E5%8A%A0%E7%B2%89/id1308878857?mt=8"
+                }
+            }
+        },
+        mounted(){
+
+            this.width = $(window).width();
+
+            Interface.getType( (data) => {
+                if(data){
+                    this.list = data;
+                }
+                this.fullscreenLoading = false;
+            })
+
+        }
+
+    });
+
+</script>
+
+</body>
+</html>

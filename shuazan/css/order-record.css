@@ -1,0 +1,61 @@
+body{
+    background: #F4F4F4;
+}
+.user-id{
+    margin-top: 5px;
+    padding: 10px;
+    background: #FFFFFF;
+    font-size:1rem;
+}
+.user-id img{
+    width: 6%;
+    max-width: 30px;
+    height:auto;
+    vertical-align: middle;
+}
+.have-order ul li{
+    padding: 10px 0 10px 15px;
+    margin-top: 5px;
+    background: #FFFFFF;
+}
+.have-order ul li .date{
+    padding-bottom: 5px;
+    font-size:1rem;
+    color: #9b9b9b;
+    border-bottom: 1px dashed #e1e1e1;
+}
+.have-order ul li .info{
+    padding-top: 10px;
+}
+.have-order ul li .info .price{
+    float: right;
+    margin-right: 10%;
+    font-size:1.4rem;
+    color: #f25b5d;
+    font-weight: 400;
+}
+.have-order ul li .info .item {
+    float: left;
+    font-size: 1.2rem;
+    font-weight: 400;
+}
+.no-order{
+    position: absolute;
+    left:50%;
+    top:40%;
+    margin-left: -45px;
+    width:100px;
+    height:auto;
+    text-align: center;
+}
+.no-order div{
+    margin-bottom: 10px;
+}
+.no-order div img{
+    width: 66.66%;
+    height:auto;
+}
+.no-order span{
+    font-size:16px;
+    color: #CCCCCC;
+}

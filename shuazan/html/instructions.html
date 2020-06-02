@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="pragma" content="no-cache">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta content="telephone=no,email=no" name="format-detection" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no"/>
+    <title>说明</title>
+    <!--css-->
+    <link rel="stylesheet" href="../css/loading.css">
+    <link rel="stylesheet" href="../css/common.css">
+    <link rel="stylesheet" href="../css/payment-popup.css">
+
+    <!--js-->
+    <script src="../js/jquery-2.1.4.js"></script>
+    <script src="../js/loading.js"></script>
+    <script src="../js/vue.js"></script>
+    <script src="../js/interface.js?v=24"></script>
+    <script src="../js/base.js"></script>
+    <script src="../js/md5_ch.js"></script>
+    <style>
+        body{
+            background: #F4F4F4;
+        }
+        .main{
+            padding:15px;
+        }
+        .main img{
+            width: 100%;
+            height:auto;
+        }
+    </style>
+</head>
+<body>
+    <div id="instructions_page">
+            <div class="loader">
+                <div class="loader-content">
+                    <img src="../images/loading.gif" alt="Loader" class="loader-loader" />
+                </div>
+            </div>
+
+            <div class="header">
+                <span class="back" @click="goBack"><img src="../images/back.png" alt="后退"></span>
+                <span class="title">说明</span>
+            </div>
+
+            <div class="main">
+                <img :src="img" alt="教程">
+            </div>
+    </div>
+
+    <script>
+        "use strict";
+
+
+        window.apiready = function() {
+
+            var vm = new Vue({
+                el: "#instructions_page",
+                data: {
+                    img: "",
+                    type_id: ""
+                },
+                methods: {
+                    goBack: function () {
+                        api.closeWin();
+                    }
+
+                },
+                created: function () {
+                    var _this = this;
+                    _this.type_id = api.pageParam.type_id;
+                    _this.type_name = decodeURI(api.pageParam.type_name);
+
+                    //获取说明教程
+                    baseAjax.typeList(4, 1, function (res) {
+                        for (var i = 0; i < res.data.length; i++) {
+                            if (_this.type_id == "29") {
+                                _this.img = "../images/kuaishoulianjie.png";
+                            }
+                            if (_this.type_id == "30" || _this.type_id == "31") {
+                                var result = res.data[1].data;
+                                for (var j = 0; j < result.length; j++) {
+                                    if (_this.type_id === result[j].type_id) {
+                                        _this.img = result[j].notice_url;
+                                    }
+                                }
+                            }
+                            if (_this.type_id == "32" || _this.type_id == "33" || _this.type_id == "34" || _this.type_id == "35") {
+                                var result = res.data[2].data;
+                                for (var j = 0; j < result.length; j++) {
+                                    if (_this.type_id === result[j].type_id) {
+                                        _this.img = result[j].notice_url;
+                                    }
+                                }
+                            }
+                        }
+                    });
+                }
+            })
+        }
+    </script>
+</body>
+</html>

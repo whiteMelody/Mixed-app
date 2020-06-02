@@ -1,0 +1,83 @@
+body{
+    background: #F4F4F4;
+}
+.warpper{
+    position: relative;
+    overflow: hidden;
+    padding:15px;
+}
+.person{
+    padding:10px 15px;
+    background: #FFFFFF;
+}
+.person .qq {
+    color: #20d4ff;
+}
+.person .content{
+    margin-top: 8px;
+    line-height: 1.8rem;
+    text-align: justify;
+}
+.danger{
+    margin-top: 10px;
+    min-height: 30px;
+}
+.danger .content{
+    float: left;
+    padding: 10px 0;
+    width: 100%;
+    margin-left: 10px;
+    font-size:1.2rem;
+    color: #e8313d;
+    letter-spacing:1px;
+    box-sizing: border-box;
+}
+.frequency{
+    padding-top:20px;
+    font-size:0;
+}
+.frequency .item{
+    display: inline-block;
+    margin-right: 4.6%;
+    margin-bottom: 15px;
+    padding:10px 0;
+    width: 30%;
+    /*height:60px;*/
+    border-radius: 5px;
+    border:1px solid #979797;
+    text-align: center;
+    box-sizing: border-box;
+}
+.frequency .item .price{
+    margin-top: 2px;
+}
+.frequency .item:nth-child(3n){
+    margin-right: 0;
+}
+.frequency .item p{
+    color: #333333;
+    font-size:1.2rem;
+}
+.frequency  .active{
+    border: 1px solid #FFFFFF;
+    background: #1DD5FF;
+}
+.frequency  .active p{
+    color: #FFFFFF;
+}
+.bottom{
+    margin: 10% auto 0 auto;
+    width: 80%;
+    height:50px;
+    text-align: center;
+    line-height: 50px;
+    color: #FFFFFF;
+    border-radius: 5px;
+    font-size: 18px;
+    background: #1DD5FF;
+}
+.tips{
+    margin-top: 30px;
+    color: #9b9b9b;
+    text-align: center;
+}

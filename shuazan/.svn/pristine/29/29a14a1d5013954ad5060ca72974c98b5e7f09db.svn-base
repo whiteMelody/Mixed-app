@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="pragma" content="no-cache">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta content="telephone=no,email=no" name="format-detection" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no"/>
+    <title>刷赞神器</title>
+    <!--css-->
+    <link rel="stylesheet" href="css/loading.css">
+    <link rel="stylesheet" href="css/common.css">
+    <link rel="stylesheet" href="css/index.css">
+    <link rel="stylesheet" href="css/liMarquee.css">
+    <!--js-->
+    <script src="js/jquery.min.js"></script>
+    <script src="js/loading.js"></script>
+    <script src="js/vue.js"></script>
+    <script src="js/interface.js?v=24"></script>
+    <script src="layer/layer.js"></script>
+    <script src="js/base.js"></script>
+    <script src="js/jquery.liMarquee.js"></script>
+    <!--[if lt IE 9]>
+    <script type="text/javascript">
+        (function () {
+            var browser = navigator.appName;
+            var b_version = navigator.appVersion;
+            var version = b_version.split(";");
+            var trim_Version = version[1].replace(/[ ]/g, "");
+            if (browser == "Microsoft Internet Explorer" && trim_Version == "MSIE6.0" || trim_Version == "MSIE7.0" || trim_Version == "MSIE8.0") {
+                alert("请使用手机浏览或者极速模式浏览");
+            }
+        })();
+    </script>
+    <![endif]-->
+    <style>
+        .layui-layer{
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        .layui-layer-title{
+            padding: 5px 0 !important;
+        }
+        .layui-layer-content{
+            padding-top: 20px !important;
+            height:auto !important;
+        }
+        .layui-layer-btn{
+            margin-top: 10px;
+            text-align: center;
+        }
+        .layui-layer-btn a{
+            display: inline-block;
+            padding:13px 16px;
+            font-size:1.2rem;
+            color: #FFFFFF;
+            background: #1BD5FF !important;
+            border-radius: 5px;
+            border:none;
+            height:18px !important;
+            line-height: 18px !important;
+        }
+        .layui-layer-btn .layui-layer-btn0{
+            margin-right: 40px;
+        }
+    </style>
+</head>
+<body>
+    <div id="index_page">
+
+        <div class="loader">
+            <div class="loader-content">
+                <img src="images/loading.gif" alt="Loader" class="loader-loader" />
+            </div>
+        </div>
+
+        <div class="banner">
+            <div>
+                <img src="images/h5banner.png" alt="QQ神器">
+            </div>
+            <div class="notice clearfix">
+                <img src="images/horn.png" alt="小喇叭" class="horn">
+                <div class="content" id="dowebok">
+                    <ul class="clearfix">
+                        <li v-for="var (val,index) in allOrderInfo">ID : {{val.user_id}},{{val.goods_title}}　</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="line-gary"></div>
+
+        <div class="order-service clearfix">
+            <div class="order box" @click="newPage('orderRecord', 'order-record.html')">
+                <img src="images/order.png" alt="我的订单">
+                <span>我的订单</span>
+            </div>
+            <div class="vertical"></div>
+            <a href="javascript:void(0)" class="service box" @click="contactService">
+                <img src="images/service.png" alt="联系客服">
+                <span>联系客服</span>
+            </a>
+        </div>
+
+        <div class="line-gary"></div>
+
+        <div class="warpper">
+            <div class="item" v-for="var (val,index) in typeList">
+                <div class="title">
+                    <div class="line"></div>
+                    <div class="content">
+                        <img :src="val.img" :alt="val.name">
+                        <span>{{val.name}}</span>
+                    </div>
+                </div>
+                <ul class="main">
+                    <li v-for="var (li,index) in val.data" @click="select(li.type_id,li.type_name)">
+                        <!--<div class="icon">-->
+                            <!--<img :src="li.icon_url" :alt="li.type_name">-->
+                        <!--</div>-->
+                        <div class="tagging-recommend tagging" v-if="li.hot == 2"><img src="images/free.png" alt="免费"></div>
+                        <div class="tagging-free tagging" v-if="li.hot == 1"><img src="images/recomed.png" alt="推荐"></div>
+                        <span class="bottom-info">{{li.type_name}}</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+
+    </div>
+
+    <script>
+        "use strict";
+
+
+        window.apiready = function() {
+
+            var vm = new Vue({
+                el: "#index_page",
+                data: {
+                    banner: [],
+                    typeList: [],
+                    itemList: [],
+                    url: "https://www.31un.com/web/",
+                    allOrderInfo: [],
+                    phone: "",
+                    QQGroup: "",
+                    fuli: "",
+                    sale: "",
+                    saleQQ: ""
+                },
+                methods: {
+
+                    newPage: function newPage(name, url, params) {
+                        api.openWin({
+                            name: name,
+                            url: url,
+                            pageParam: params,
+                            bgColor: '#fff'
+                        });
+                    },
+
+                    //通过点击获取type_id跳转相关页面
+                    select: function (type_id, type_name) {
+                        if (type_id == 3 || type_id == 5) {
+                            this.newPage('selectShuoshuo', 'html/select-shuoshuo.html', {
+                                type_id: type_id,
+                                type_name: type_name
+                            });
+                        } else if (type_id == 23) {
+                            this.newPage('nickName', 'html/nickname.html');
+                        } else if (type_id == 24) {
+                            this.newPage('headPortrait', 'html/head-portrait.html');
+                        } else if (type_id == 29 || type_id == 30 || type_id == 31) {
+                            this.newPage('aboutKuaishou', 'html/about-kuaishou.html', {
+                                type_id: type_id,
+                                type_name: type_name
+                            });
+                        } else if (type_id == 32 || type_id == 33 || type_id == 34 || type_id == 35) {
+                            this.newPage('aboutKSing', 'html/about-kSing.html', {
+                                type_id: type_id,
+                                type_name: type_name
+                            });
+                        } else {
+                            this.newPage('aboutQQ', 'html/about-qq.html', {type_id: type_id, type_name: type_name});
+                        }
+                    },
+
+                    //联系客服
+                    contactService: function () {
+                        var _this = this;
+                        event.stopPropagation();
+                        layer.open({
+                            closeBtn: 0,
+                            btn: ['售后Q群', '福利Q群'],
+                            title: ['联系客服', 'text-align:center;padding:20px 0 20px 0;font-size:1.4rem;font-weight:bold;color:#ffffff;background:#1AD5FF'],
+                            content: '<p style="font-size: 1.2rem;text-align: center">售后电话：' + _this.phone + '</p><p style="font-size: 1.2rem;text-align: center">售后Q群：' + _this.saleQQ + '</p><p style="font-size: 1.2rem;text-align: center;color: #23d4ff;margin-top: 1rem">服务时间：周一至周五</p><p style="font-size: 1.2rem;text-align: center;color: #23d4ff;">10:00-19:00</p>',
+                            area: ['83%', 'auto'],
+                            shadeClose: true,
+                            yes: function (index, layero) {
+                                window.location.href = "//shang.qq.com/wpa/qunwpa?idkey=" + _this.sale;
+                                layer.closeAll();
+                            },
+                            btn2: function () {
+                                window.location.href = "//shang.qq.com/wpa/qunwpa?idkey=" + _this.fuli;
+                                //return false 开启该代码可禁止点击该按钮关闭
+                            }
+                        });
+                    }
+                },
+                created: function () {
+                    var _this = this;
+                    //自动登录
+                    baseAjax.login("1", function (res) {
+                        base.setCookie("user_id", res.data.user_id);
+                    });
+
+                    //获取index页面展示信息
+                    baseAjax.typeList(4, 1, function (res) {
+                        _this.typeList = res.data;
+                    });
+
+                    //获取所有用户订单滚动消息
+                    baseAjax.orderList("", 1, function (res, msg) {
+                        _this.allOrderInfo = res.data;
+                    });
+
+                    //获取qq群号以及联系电话
+                    baseAjax.getQQGroup(function (res) {
+                        _this.fuli = res.data.fuli.web;
+                        _this.phone = res.data.phone;
+                        _this.sale = res.data.sale.web;
+                        _this.saleQQ = res.data.sale.qq;
+                    });
+
+                    //页面渲染完成之后滚动消息
+                    var timer1 = setInterval(function () {
+                        _this.lis = $(".banner .content ul li");
+                        if (_this.lis.length > 1) {
+                            clearInterval(timer1);
+                            $('#dowebok').liMarquee({
+                                drag: false,
+                                hoverstop: false,
+                                scrollamount: 30
+                            });
+                        }
+                    }, 167)
+                }
+            })
+        }
+    </script>
+</body>
+</html>

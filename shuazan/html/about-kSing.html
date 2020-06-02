@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="pragma" content="no-cache">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta content="telephone=no,email=no" name="format-detection" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no"/>
+    <title>全民K歌</title>
+    <!--css-->
+    <link rel="stylesheet" href="../css/loading.css">
+    <link rel="stylesheet" href="../css/common.css">
+    <link rel="stylesheet" href="../css/about.css">
+    <link rel="stylesheet" href="../css/payment-popup.css">
+
+    <!--js-->
+    <script src="../js/jquery-2.1.4.js"></script>
+    <script src="../js/loading.js"></script>
+    <script src="../js/vue.js"></script>
+    <script src="../js/interface.js?v=24"></script>
+    <script src="../js/base.js"></script>
+    <script src="../js/md5_ch.js"></script>
+    <style>
+        body{
+            background: #F4F4F4;
+        }
+        .input .warpper{
+            position: relative;
+        }
+        .input input{
+            width: 73%;
+            border-radius: 5px 0 0 5px;
+            border-right: none;
+        }
+        .input span{
+            position: absolute;
+            right: 0;
+            top:0;
+            width: 27%;
+            height:52px;
+            background: #25D3FF;
+            font-size: 1.2rem;
+            color: #FFFFFF;
+            text-align: center;
+            line-height: 52px;
+            border-radius: 0 5px 5px 0;
+        }
+    </style>
+</head>
+<body>
+<div id="fans-quantity">
+
+    <div class="loader">
+        <div class="loader-content">
+            <img src="../images/loading.gif" alt="Loader" class="loader-loader" />
+        </div>
+    </div>
+
+    <div class="header">
+        <span class="back" @click="goBack"><img src="../images/back.png" alt="后退"></span>
+        <span class="title">{{type_name}}</span>
+    </div>
+
+    <div class="input">
+        <div class="warpper">
+            <input type="text" placeholder="复制K歌链接" v-model="kSing_id">
+            <span @click="viewCourse">查看教程</span>
+        </div>
+    </div>
+
+    <div class="frequency">
+        <ul>
+            <li class="item" v-for="var (val,index2) in data" @click="index = index2" :class="index2 == index ? 'active' : ''">
+                <p class="time">{{val.zan_num}}次</p>
+                <p class="price">￥{{(val.score_num / 1000).toFixed(2)}}</p>
+            </li>
+        </ul>
+    </div>
+
+    <div class="danger clearfix" v-if="result.notice != ''">
+        <p class="content">{{result.notice}}</p>
+    </div>
+
+    <div class="bottom" @click="order">立即支付</div>
+
+    <transition name="fade">
+        <div class="alert-tips" v-if="show">{{notice}}</div>
+    </transition>
+
+    <div class="mengceng" @click="closeGray"></div>
+
+    <div class="selectPay">
+        <div @click="weixinPay">
+            <span><img src="../images/weixin.png" alt="微信支付"></span>
+            <span class="text">微信支付</span>
+        </div>
+        <div @click="zhifubaoPay">
+            <span><img src="../images/zhifubao.png" alt="支付宝支付"></span>
+            <span class="text">支付宝支付</span>
+        </div>
+    </div>
+</div>
+
+<script>
+    "use strict";
+
+
+    window.apiready = function() {
+
+        var vm = new Vue({
+            el: "#fans-quantity",
+            data: {
+                type_id: "",
+                type_name: "",
+                data: [],
+                result: "",
+                kSing_id: "",
+                index: 0,
+                url: "https://www.31un.com/web/",
+                show: false,
+                notice: "",
+                qm_id: ""
+            },
+            methods: {
+                goBack: function () {
+                    api.closeWin();
+                },
+                viewCourse: function () {
+                    api.openWin({
+                        name: 'instructions',
+                        url: 'instructions.html',
+                        pageParam: {type_id: this.type_id, type_name: this.type_name},
+                        bgColor: '#fff'
+                    });
+                },
+                closeGray: function () {
+                    $(".mengceng").removeClass("mengcengActive");
+                    $(".selectPay").removeClass("closeActive");
+                },
+                weixinPay: function () {
+                    var _this = this;
+                    pay.payFunction(_this.type_id, '2', _this.qm_id, "", _this.data[_this.index].zan_num);
+                    $(".mengceng").removeClass("mengcengActive");
+                    $(".selectPay").removeClass("closeActive");
+                },
+                zhifubaoPay: function () {
+                    var _this = this;
+                    pay.payFunction(_this.type_id, '1', _this.qm_id, "", _this.data[_this.index].zan_num);
+                    $(".mengceng").removeClass("mengcengActive");
+                    $(".selectPay").removeClass("closeActive");
+                },
+                order: function () {
+                    var _this = this;
+                    if (!_this.kSing_id.match(/s=(\S*)/) || _this.kSing_id == "") {
+                        _this.show = true;
+                        _this.notice = "请复制有效的K歌链接";
+                        if (_this.show) {
+                            var timer1 = setTimeout(function () {
+                                _this.show = false;
+                            }, 2000)
+                        }
+                        return false
+                    }
+                    _this.qm_id = _this.kSing_id.match(/s=(\S*)&shareuid=/)[1];
+
+                    //如果是微信或者QQ内部打开，直接用微信去支付
+                    if (base.versions.isQQ) {
+                        pay.payFunction(_this.type_id, '2', _this.qm_id, "", _this.data[_this.index].zan_num);
+                    } else {
+                        _this.mengceng = true;
+                        $(".mengceng").addClass("mengcengActive");
+                        $(".selectPay").addClass("closeActive");
+                    }
+                }
+            },
+            created: function () {
+                var _this = this;
+
+                _this.type_id = api.pageParam.type_id;
+                _this.type_name = decodeURI(api.pageParam.type_name);
+
+                //获取全民k歌次数价格信息
+                baseAjax.goVisit(_this.type_id, function (res) {
+                    console.info(res);
+                    _this.result = res;
+                    _this.data = res.data;
+                });
+            }
+        })
+    }
+</script>
+</body>
+</html>

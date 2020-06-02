@@ -1,0 +1,92 @@
+body{padding-bottom: 20px}
+.input{
+    padding: 14px 15px;
+    font-size: 0;
+    background: #FFFFFF;
+}
+.input input{
+    padding:0 10px;
+    height:52px;
+    border: 1px solid #979797;
+    outline: none;
+    text-align: center;
+    font-size: 1.2rem;
+    color: #000000;
+    box-sizing: border-box;
+}
+.input input::-webkit-input-placeholder{
+    color: #9b9b9b;
+    font-size: 16px;
+}
+.danger{
+    min-height: 30px;
+}
+/*.danger .icon{*/
+    /*position: relative;*/
+    /*float: left;*/
+    /*margin-left: 15px;*/
+    /*width: 15px;*/
+    /*height: 38px;*/
+/*}*/
+/*.danger .icon img{*/
+    /*position: absolute;*/
+    /*width: 100%;*/
+    /*height:auto;*/
+    /*top:50%;*/
+    /*left: 0;*/
+    /*margin-top: -50%;*/
+/*}*/
+.danger .content{
+    padding: 0 15px;
+    width: 100%;
+    font-size:1rem;
+    color: #e8313d;
+    line-height: 19px;
+    letter-spacing:1px;
+    text-align: justify;
+    box-sizing: border-box;
+}
+.frequency{
+    padding:10px 15px 0 15px;
+    font-size:0;
+}
+.frequency .item{
+    display: inline-block;
+    margin-right: 5%;
+    margin-bottom: 15px;
+    padding: 10px 0;
+    width: 30%;
+    /*height:60px;*/
+    border-radius: 5px;
+    border:1px solid #979797;
+    text-align: center;
+    box-sizing: border-box;
+}
+.frequency .item .price{
+    margin-top: 2px;
+}
+.frequency .item:nth-child(3n){
+    margin-right: 0;
+}
+.frequency .item p{
+    color: #333333;
+    font-size:1.2rem;
+}
+.frequency  .active{
+    border: 1px solid #FFFFFF;
+    background: #1DD5FF;
+}
+.frequency  .active p{
+    color: #FFFFFF;
+}
+.bottom{
+    margin: 20% auto 0 auto;
+    width: 80%;
+    height:50px;
+    text-align: center;
+    line-height: 50px;
+    color: #FFFFFF;
+    border-radius: 5px;
+    font-size: 18px;
+    background: #1DD5FF;
+}

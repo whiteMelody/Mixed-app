@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta content="telephone=no,email=no" name="format-detection" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no"/>
+
+    <!-- 7E css -->
+    <link rel="stylesheet" href="../css/base.css">
+    <link rel="stylesheet" href="../css/style.css">
+
+    <title>快手刷粉</title>
+</head>
+<body>
+
+<div id="hall_page warpper-gray-3">
+
+    <loader :show="fullscreenLoading"></loader>
+
+    <navTitle :title="'互推大厅 '" :back="false" :fixed="true"></navTitle>
+
+    <!--复制内容弹窗-->
+    <div class="dialogBg" style="z-index: 99999;" v-show="showComment == true" @click="showComment = false"></div>
+    <div class="fixed lh50px F14 warpper-white radius5" v-show="showComment == true" style="width: 320px; height: 240px;  top: 0; right: 0; left: 0; bottom: 0; margin: auto; z-index: 999999;">
+        <p class="text-center h50px lh50px bor-gray bor-solid-1b Fblack F16">评论请评论以下内容</p>
+        <div class="clear h10px"></div>
+
+        <div class="pa15">
+            <div class="wb100 warpper-gray-3 radius5">
+                <p class="pa15 h60px lh20px text-over-hidden-3" id="bar" v-if="searchType == 'cmnt'">{{getComment()}}</p>
+            </div>
+        </div>
+
+        <div class="clear h10px bor-gray bor-solid-1b"></div>
+
+        <div class="wb100 text-center">
+            <div class="wb50 fl h45px lh45px" @click="showComment = false">
+                <div class="wb100 bor-gray bor-solid-1r h45px Fblack">
+                    取消
+                </div>
+            </div>
+            <div class="wb50 fl h45px lh45px Fblue copyBtn" @click="toComment">
+                复制并前往评论
+            </div>
+        </div>
+
+    </div>
+
+
+    <!--在浏览器打开弹窗-->
+    <div class="dialogBg" style="z-index: 99999;" v-show="showOpen == true" @click="showOpen = false">
+        <div class="pa15">
+            <img src="~@/assets/images//info-open.png" class="wb100">
+        </div>
+    </div>
+
+    <!--点赞/评论完成弹窗-->
+    <div class="dialogBg" style="z-index: 9999; background: rgba(0,0,0,.7);" v-show="showResult == true" @click="showResult = false"></div>
+    <div class="w270px h150px fixed warpper-white Fgray-3 lh45px radius5 F16 text-center" v-show="showResult == true" style="top: 0; right: 0; left: 0; bottom: 0; margin: auto; z-index: 9999;">
+        <div class="wb100">
+            <template v-if="searchType == 'cmnt'">
+                <p class="h60px lh60px Fblack">请确认是否已完成评论</p>
+                <p class="bor-gray bor-solid-1b bor-solid-1t Forange-2" @click="doneSubmit">我已评论</p>
+            </template>
+            <template v-else>
+                <p class="h60px lh60px Fblack">请确认是否已完成点赞</p>
+                <p class="bor-gray bor-solid-1b bor-solid-1t Forange-2" @click="doneSubmit">我已点赞</p>
+            </template>
+            <p class="Fgray-2" @click="showResult = false">取消</p>
+        </div>
+    </div>
+
+    <div class="wb100 fixed" style="top: 50px;">
+        <div class="wb100 text-center h45px lh45px warpper-white">
+            <div class="wb50 fl" @click="changeData('like')">
+                <span :class="searchType == 'like' ? 'bor-oragne2 bor-solid-2b h38px lh38px Fpink' : 'h35px lh35px Fgray-3'" class="display-inline">点赞大厅</span>
+            </div>
+            <div class="wb50 fl" @click="changeData('cmnt')">
+                <div class="wb100">
+                    <span :class="searchType == 'cmnt' ? 'bor-oragne2 bor-solid-2b h38px lh38px Fpink' : 'h35px lh35px Fgray-3'" class="display-inline">评论大厅</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="clear1"></div>
+
+    <div class="wb100 warpper-white" v-infinite-scroll="getData" infinite-scroll-disabled="loading" infinite-scroll-distance="5">
+        <div class="pal15">
+            <div v-for="(item,key) in list">
+
+                <div class="clear1"></div>
+                <div class="wb100 h60px" @click="openDialog(key)">
+                    <div class="w60px h60px img-area warpper-gray-3 radius5 fl">
+                        <img :src="item.cover_img">
+                    </div>
+
+                    <div class="fl pal15 pat5 pab5 lh25px">
+
+                        <template v-if="searchType == 'cmnt'">
+                            <p class="text-over-hidden Fgray-3 F16">已通过平台获得<span class="Fnum Fpink">{{item.like_num}}</span>条评论</p>
+                            <p class="text-over-hidden Fgray-2 F14">评论可获得<span class="Fnum Fpink">{{item.score}}</span>点积分</p>
+                        </template>
+
+                        <template v-else>
+                            <p class="text-over-hidden Fgray-3 F16">已通过平台获得<span class="Fnum Fpink">{{item.like_num}}</span>个赞</p>
+                            <p class="text-over-hidden Fgray-2 F14">点赞可获得<span class="Fnum Fpink">{{item.score}}</span>点积分</p>
+                        </template>
+
+                    </div>
+
+                    <div class="fr h60px mar15">
+                        <img src="~@/assets/images//arrow-right.png" style="height: 16px; margin-top: 22px;">
+                    </div>
+
+                </div>
+                <div class="clear1 bor-gray bor-solid-1b"></div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="clear1"></div>
+
+    <template v-if="last == true">
+        <div class="wb100 Fgray-3">
+            <div class="text-center h40px lh40px center w120px F14" >
+                <span class="fl mal10">暂无更多数据</span>
+            </div>
+        </div>
+    </template>
+    <template v-else-if="empty == true">
+        <div class="wb100 text-center">
+            <p class="Fgray-2 F16 lh25px h25px">还没有明细记录哦~</p>
+            <p class="Fgray-1 F14 lh25px h25px">快来占领沙发吧！</p>
+            <div class="clear1"></div>
+            <router-link :to="{ name: 'Join'}">
+                <div class="radius5  bor-red  bor-solid-1a wb40 center h40px lh40px"><p class="Fred">加入互推</p></div>
+            </router-link>
+        </div>
+    </template>
+    <template v-else>
+        <div class="wb100" v-show="loading">
+            <div class="text-center Fgray-3 h40px lh40px center w120px F14">
+                <img src="~@/assets/images/loading-2.gif" class="h20px fl mat10">
+                <span class="fl mal10">数据加载中...</span>
+            </div>
+        </div>
+    </template>
+
+    <template v-if="login">
+        <router-link :to="{ name: 'Join', params:{ joinType: searchType } }">
+            <div class="w60px h60px lh60px text-center bg-linear1 fixed Fwhite F12 radius50per box-shadow2" style="bottom: 85px; right: 15px;">
+                加入互推
+            </div>
+        </router-link>
+    </template>
+
+    <template v-else>
+        <router-link :to="{ name: 'Login' }">
+            <div class="w60px h60px lh60px text-center bg-linear1 fixed Fwhite F12 radius50per box-shadow2" style="bottom: 85px; right: 15px;">
+                加入互推
+            </div>
+        </router-link>
+    </template>
+
+    <div class="clear1"></div>
+
+    <!--<iframe style="width: 300px; height: 300px;" :src="mySrc"></iframe>-->
+    <div class="w100px h40px lh40px text-center bg-linear1 fixed Fwhite F12 radius20 box-shadow2" style="bottom: 85px; left: 15px;" @click="download">
+        下载APP
+    </div>
+
+    <navFooter :active="2"></navFooter>
+
+</div>
+
+<script src="../js/vue.js"></script>
+<script src="../js/base.js"></script>
+<script src="../js/interface.js?v=25"></script>
+<script>
+
+    import Base from '../js/base.js'
+    import Interface from '../js/interface.js'
+
+    var vm = new Vue({
+        el: "#hall_page",
+        data: {
+            fullscreenLoading: true,
+            login: false,
+            searchType: 'like',
+            showComment: false,
+            showOpen: false,
+            showResult: false,
+            selectIndex: 0,
+            list: [],
+            page: 0,
+            pageSize: 6,
+            loading: true,
+            empty: false,
+            last: false
+        },
+        methods: {
+
+            download(){
+                if(Base.versions.isAndroid){
+                    window.location.href = "http://www.7shuiguo.cn/kwai_chuizi_v.1.0.1.apk"
+                }else{
+                    window.location.href = "https://itunes.apple.com/cn/app/k%E6%AD%8C%E5%8A%A0%E7%B2%89/id1308878857?mt=8"
+                }
+            },
+
+            getComment(){
+                if(this.list[this.selectIndex]){
+                    return Base.isNull(this.list[this.selectIndex].comment) ? '666' : this.list[this.selectIndex].comment;
+                }else{
+                    return '666';
+                }
+            },
+
+            openDialog(key){
+                this.selectIndex = key;
+
+                //判断浏览器内核
+                if(Base.versions.isMobile){
+                    if(Base.versions.isWeiXin){
+                        this.showOpen = true;
+                        return false;
+                    }else{
+                        if(Base.versions.isQQ){
+                            if(Base.versions.isAndroid){
+                                //可以打开
+                            }else{
+                                this.showOpen = true;
+                                return false;
+                            }
+                        }
+                    }
+                }else{
+                    Toast('请在手机上打开');
+                    return false;
+                }
+
+                if(!this.login){
+                    this.$router.push({ name: 'Login' });
+                    return false;
+                }
+
+                if(this.searchType == 'cmnt'){
+                    this.showComment = true;
+                }else{
+                    //打开提示，并访问快手
+                    Interface.click(this.list[this.selectIndex].photo_id, this.searchType, (data, errorMsg)=> {
+                        if(data){
+                            window.location.href = 'kwai://work/' + this.list[this.selectIndex].photo_id;
+                            setTimeout( ()=>{
+                                this.showResult = true;
+                            },2000)
+                        }else{
+                            Toast(errorMsg);
+                        }
+                    })
+                }
+
+            },
+
+            changeData(val){
+                this.searchType = val;
+                this.list = [];
+                this.page = 0;
+                this.pageSize = 20;
+                this.loading = true;
+                this.empty = false;
+                this.last = false;
+                this.getData();
+            },
+
+            toComment(){
+
+                //复制文字插件
+                let content = this.getComment();
+
+                Interface.click(this.list[this.selectIndex].photo_id, this.searchType, (data, errorMsg)=> {
+                    if(data){
+                        window.location.href = 'kwai://work/' + this.list[this.selectIndex].photo_id;
+//            Base.openkwai('work/'+ this.list[ this.selectIndex ].photo_id);
+                        setTimeout( ()=>{
+                            this.showResult = true;
+                        },2000)
+                    }else{
+                        Toast(errorMsg);
+                    }
+                })
+
+                this.showComment = false;
+                var c = new Clipboard('.copyBtn', {
+                    text: function (trigger) {
+                        return content;
+                    }
+                });
+                c.on('success', function (e) {
+                    Toast('复制成功');
+                });
+
+                c.on('error', function (e) {
+                    Toast('复制失败');
+                });
+
+            },
+
+            getData(){
+
+                let _this = this;
+
+                _this.loading = true;
+
+                if(_this.last || _this.empty){
+                    _this.loading = false;
+                    if(_this.page == 0){
+                        setTimeout( ()=> {
+                            _this.fullscreenLoading = false;
+                            window.scrollTo(0,0);
+                        },100);
+                    }
+                    return ;
+                }
+
+                _this.page ++;
+
+                Interface.getList(this.searchType, this.page, this.pageSize, (data) => {
+
+                    console.log(data);
+
+                    if (data.length == 0) {
+                        if(_this.page == 1){
+                            _this.empty = true;
+                        }else{
+                            _this.empty = false;
+                            _this.last = true;
+                        }
+                    } else {
+                        if(data.length < _this.pageSize){
+                            _this.empty = false;
+                            _this.last = true;
+                        }
+                    }
+
+                    this.list = this.list.concat(data);
+
+                    this.loading = false;
+
+                    if(_this.page == 1){
+                        setTimeout( ()=> {
+                            _this.fullscreenLoading = false;
+                            window.scrollTo(0,0);
+                        },100);
+                    }
+
+                })
+            },
+
+            doneSubmit(){
+                //完成点赞/评论
+
+                this.showResult = false;
+
+                Interface.complete(this.list[this.selectIndex].photo_id, this.searchType, (data, errorMsg)=> {
+                    if(data){
+                        //积分++
+                        Toast(data.msg);
+                    }else{
+                        Toast(errorMsg);
+                    }
+                })
+
+            },
+
+        },
+        mounted(){
+
+            Interface.getInfo( (data)=> {
+                if(data){
+                    this.login = true;
+                }else{
+                    this.login = false;
+                }
+            })
+
+            this.getData();
+
+        }
+
+    });
+
+</script>
+
+</body>
+</html>

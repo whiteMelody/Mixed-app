@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="pragma" content="no-cache">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta content="telephone=no,email=no" name="format-detection" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no"/>
+    <title>粉丝数</title>
+    <!--css-->
+    <link rel="stylesheet" href="../css/loading.css">
+    <link rel="stylesheet" href="../css/common.css">
+    <link rel="stylesheet" href="../css/about.css">
+    <link rel="stylesheet" href="../css/payment-popup.css">
+
+    <!--js-->
+    <script src="../js/jquery-2.1.4.js"></script>
+    <script src="../js/loading.js"></script>
+    <script src="../js/vue.js"></script>
+    <script src="../js/interface.js?v=24"></script>
+    <script src="../js/base.js"></script>
+    <script src="../js/md5_ch.js"></script>
+    <style>
+        body{
+            background: #F4F4F4;
+        }
+        .input .warpper{
+            position: relative;
+        }
+        .input input{
+            width: 73%;
+            border-radius: 5px 0 0 5px;
+            border-right: none;
+        }
+        .input span{
+            display: inline-block;
+            width: 27%;
+            height:52px;
+            background: #25D3FF;
+            font-size: 1rem;
+            color: #FFFFFF;
+            text-align: center;
+            line-height: 52px;
+            border-radius: 0 5px 5px 0;
+        }
+    </style>
+</head>
+<body>
+<div id="fans-quantity">
+
+    <div class="loader">
+        <div class="loader-content">
+            <img src="../images/loading.gif" alt="Loader" class="loader-loader" />
+        </div>
+    </div>
+
+    <div class="header">
+        <span class="back" @click="goBack"><img src="../images/back.png" alt="后退"></span>
+        <span class="title">{{type_name}}</span>
+    </div>
+
+    <div class="input">
+        <div class="warpper">
+            <input type="text" placeholder="复制作品链接" v-model="hand_id">
+            <span @click="viewCourse">查看教程</span>
+        </div>
+    </div>
+
+    <div class="frequency">
+        <ul>
+            <li class="item" v-for="var (val,index2) in data" @click="index = index2" :class="index2 == index ? 'active' : ''">
+                <p class="time">{{val.zan_num}}次</p>
+                <p class="price">￥{{(val.score_num / 1000).toFixed(2)}}</p>
+            </li>
+        </ul>
+    </div>
+
+    <div class="danger clearfix" v-if="resultNotice != ''">
+        <p class="content">{{resultNotice}}</p>
+    </div>
+
+    <div class="bottom" @click="order">立即支付</div>
+    <div class="tips fs20" v-if="type_id == 30 || type_id == 31">为了防止被屏蔽，此任务需要24小时左右的时间，请耐心等候</div>
+
+    <transition name="fade">
+        <div class="alert-tips" v-if="show">{{notice}}</div>
+    </transition>
+
+    <div class="mengceng" @click="closeGray"></div>
+
+    <div class="selectPay">
+        <div @click="weixinPay">
+            <span><img src="../images/weixin.png" alt="微信支付"></span>
+            <span class="text">微信支付</span>
+        </div>
+        <div @click="zhifubaoPay">
+            <span><img src="../images/zhifubao.png" alt="支付宝支付"></span>
+            <span class="text">支付宝支付</span>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    "use strict";
+
+
+    window.apiready = function() {
+
+        var vm = new Vue({
+            el: "#fans-quantity",
+            data: {
+                type_id: "",
+                type_name: "",
+                data: [],
+                resultNotice: "",
+                hand_id: "",
+                index: 0,
+                url: "https://www.31un.com/web/",
+                ks_user: "",
+                ks_photo: "",
+                show: false,
+                notice: ""
+            },
+            methods: {
+                goBack: function () {
+                    api.closeWin();
+                },
+                viewCourse: function () {
+                    api.openWin({
+                        name: 'instructions',
+                        url: 'instructions.html',
+                        pageParam: {type_id: this.type_id, type_name: this.type_name},
+                        bgColor: '#fff'
+                    });
+                },
+                closeGray: function () {
+                    $(".mengceng").removeClass("mengcengActive");
+                    $(".selectPay").removeClass("closeActive");
+                },
+                weixinPay: function () {
+                    var _this = this;
+                    pay.payFunction(_this.type_id, '2', _this.ks_user, _this.ks_photo, _this.data[_this.index].zan_num);
+                    $(".mengceng").removeClass("mengcengActive");
+                    $(".selectPay").removeClass("closeActive");
+                },
+                zhifubaoPay: function () {
+                    var _this = this;
+                    pay.payFunction(_this.type_id, '1', _this.ks_user, _this.ks_photo, _this.data[_this.index].zan_num);
+                    $(".mengceng").removeClass("mengcengActive");
+                    $(".selectPay").removeClass("closeActive");
+                },
+                order: function () {
+                    var _this = this;
+
+                    if (_this.hand_id == "" || !_this.hand_id.match(/userId=(\S*)/) || !_this.hand_id.match(/photoId=(\S*)/)) {
+                        _this.show = true;
+                        _this.notice = "请输入有效链接";
+                        if (_this.show) {
+                            var timer1 = setTimeout(function () {
+                                _this.show = false;
+                            }, 2000)
+                        }
+                        return false
+                    } else {
+                        //因为userId和photo_id的位置并不确定,所以判断加以获取
+                        if (!_this.hand_id.match(/userId=(\S*)&/)) {
+                            _this.ks_user = _this.hand_id.match(/userId=(\S*)/)[1];
+                        } else {
+                            _this.ks_user = _this.hand_id.match(/userId=(\S*)&/)[1];
+                        }
+                        if (!_this.hand_id.match(/photoId=(\S*)&/)) {
+                            _this.ks_photo = _this.hand_id.match(/photoId=(\S*)/)[1];
+                        } else {
+                            _this.ks_photo = _this.hand_id.match(/photoId=(\S*)&/)[1];
+                        }
+                        //如果是微信或者QQ内部打开，直接用微信去支付
+                        if (base.versions.isQQ) {
+                            pay.payFunction(_this.type_id, '2', _this.ks_user, _this.ks_photo, _this.data[_this.index].zan_num);
+                        } else {
+                            _this.mengceng = true;
+                            $(".mengceng").addClass("mengcengActive");
+                            $(".selectPay").addClass("closeActive");
+                        }
+                    }
+                }
+            },
+            created: function () {
+                var _this = this;
+
+                _this.type_id = api.pageParam.type_id;
+                _this.type_name = decodeURI(api.pageParam.type_name);
+
+
+                //获取快手粉丝数次数价格信息
+                baseAjax.goVisit(_this.type_id, function (res) {
+                    console.info(res);
+                    if (_this.type_id == "29") {
+                        _this.resultNotice = ""
+                    } else {
+                        _this.resultNotice = res.notice;
+                    }
+                    _this.data = res.data;
+                });
+            }
+        })
+    }
+</script>
+</body>
+</html>

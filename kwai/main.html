@@ -1,0 +1,98 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,initial-scale=1.0,width=device-width"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>快手刷粉</title>
+    <link rel="stylesheet" type="text/css" href="./css/api.css" />
+    <link rel="stylesheet" type="text/css" href="./css/base.css" />
+    <style type="text/css">
+    html,body{
+        height: 100%;
+    }
+    </style>
+</head>
+<body>
+
+<div class="wb100" id="main_page">
+
+    <div class="wb100">
+        <div class="clear h70px"></div>
+        <div class="wb100 fixed pat10 pab10 warpper-white bor-gray bor-solid-1t" style="bottom: 0;">
+
+            <template v-for="(item, key) in footerList">
+                <div class="wb33333 fl text-center" @click="changeNav(key)" tapmode="">
+                    <img :src="'../images/icon-main' + (key - 1) + '.png'" v-if="currentNav != key" class="h25px">
+                    <img src="../images/icon-main' + (key - 1) + '-active.png" v-if="currentNav == key" class="h25px">
+                    <p class="F12 lh20px" :class="currentNav == key ? 'Fpink ' : 'Fgray-2'">{{item}}</p>
+                </div>
+            </template>
+
+            <div class="clear"></div>
+        </div>
+    </div>
+
+</div>
+
+</body>
+<script type="text/javascript" src="./js/api.js"></script>
+<script type="text/javascript" src="./js/vue.js"></script>
+
+<script type="text/javascript">
+
+    var vm = new Vue({
+        el: "#main_page",
+        data: {
+            currentNav: 0,
+            footerList : ['云端刷量','互推大厅','个人中心'],
+        },
+        methods: {
+            changeNav: function changeNav(i){
+                api.setFrameGroupIndex({
+                    name: 'group1',
+                    index: i,
+                    scroll: true
+                });
+            },
+        },
+        created: function created() {
+
+            var _this = this;
+
+            apiready = function(){
+
+                var frameH = api.winHeight - 30;
+
+                api.openFrameGroup({
+                    name: 'group1',
+                    rect: {
+                        x: 0,
+                        y: 0,
+                        w: 'auto',
+                        h: frameH
+                    },
+                    frames: [{
+                        name: 'index',
+                        url: 'html/index.html',
+                        bgColor: '#fff'
+                    }, {
+                        name: 'hall',
+                        url: 'html/hall.html',
+                        bgColor: '#fff'
+                    }, {
+                        name: 'user',
+                        url: 'html/user.html',
+                        bgColor: '#fff'
+                    }, ]
+                }, function(ret, err) {
+                    _this.currentNav = ret.index;
+                });
+
+            };
+        }
+
+    });
+
+</script>
+</html>

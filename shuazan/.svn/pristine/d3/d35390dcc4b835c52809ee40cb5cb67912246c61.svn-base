@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="pragma" content="no-cache">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta content="telephone=no,email=no" name="format-detection" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no"/>
+    <title>昵称</title>
+    <!--css-->
+    <link rel="stylesheet" href="css/loading.css">
+    <link rel="stylesheet" href="css/common.css">
+    <!--js-->
+    <script src="js/jquery-2.1.4.js"></script>
+    <script src="js/loading.js"></script>
+    <script src="js/vue.js"></script>
+    <script src="js/interface.js?v=24"></script>
+    <script src="layer/layer.js"></script>
+    <script src="js/base.js"></script>
+    <style>
+        body{
+            background: #F4F4F4;
+        }
+        .nickname-list{
+            margin-top: 8px;
+        }
+        .nickname-list ul li{
+            padding: 10px;
+            margin-bottom: 5px;
+            font-size: 1.2rem;
+            background: #FFFFFF;
+        }
+        .no-more{
+            padding:10px 0;
+            font-size:1.2rem;
+            text-align: center;
+        }
+        .active{
+            background: #25D3FF !important;
+            color: #FFFFFF;
+        }
+    </style>
+</head>
+<body>
+    <div id="nickname_page">
+
+        <div class="loader">
+            <div class="loader-content">
+                <img src="images/loading.gif" alt="Loader" class="loader-loader" />
+            </div>
+        </div>
+
+        <div class="header">
+            <span class="back" @click="goBack"><img src="images/back.png" alt="后退"></span>
+            <span class="title">昵称</span>
+        </div>
+
+        <div class="nickname-list">
+            <ul>
+                <li v-for="var (val,index2) in data" @click="copy(val.name,index2)" :class="index2 == index ? 'active' : ''">{{val.name}}</li>
+            </ul>
+            <p v-if="moreData" class="no-more">暂无更多数据</p>
+        </div>
+
+    </div>
+
+    <script>
+        "use strict";
+
+
+        window.apiready = function() {
+
+            var vm = new Vue({
+                el: "#nickname_page",
+                data: {
+                    p: 1,
+                    data: "",
+                    total: "",
+                    moreData: false,
+                    lis: "",
+                    index: -1
+                },
+                methods: {
+                    goBack: function () {
+                        api.closeWin();
+                    },
+
+                    copy: function (name, index2) {
+                        var _this = this;
+                        //切换背景色
+                        _this.index = index2;
+                        //复制name的内容
+                    }
+                },
+                created: function () {
+                    var _this = this;
+
+                    //获取昵称列表
+                    baseAjax.getNickName(_this.p, function (res) {
+                        console.info(res);
+                        _this.total = res.total;
+                        _this.data = res.data;
+                        _this.p++;
+                    });
+
+                    //滚动到底部加载数据
+                    $(window).scroll(function () {
+                        var scrollTop = $(this).scrollTop();
+                        var windowHeight = $(this).height();
+                        var scrollHright = $(document).height();
+                        if (scrollHright - (scrollTop + windowHeight) < 2) {
+                            if (_this.p > _this.total) {
+                                _this.moreData = true;
+                                return false
+                            }
+                            baseAjax.getNickName(_this.p, function (res) {
+                                _this.data = _this.data.concat(res.data);
+                                _this.p++;
+                            });
+                        }
+                    });
+                }
+            })
+        }
+    </script>
+</body>
+</html>

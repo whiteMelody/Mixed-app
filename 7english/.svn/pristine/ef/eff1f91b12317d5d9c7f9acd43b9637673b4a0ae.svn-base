@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta content="telephone=no,email=no" name="format-detection" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no"/>
+
+    <!-- 7E css -->
+    <link rel="stylesheet" href="../css/base.css">
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/loading.css">
+    <!-- Element-UI css -->
+    <link rel="stylesheet" href="../css/element-ui@1.2.4.css">
+    <!-- 7E js -->
+    <script src="../js/jquery-2.1.4.js"></script>
+    <script src="../js/vue.js"></script>
+    <!-- Element-UI js -->
+    <script src="../js/element-ui@1.2.4.js"></script>
+    <script src="../layer/layer.js"></script>
+    <script src="../js/vue-component.js"></script>
+    <script src="../js/base.js"></script>
+    <script src="../js/interface.js"></script>
+    <script src="../js/md5.js"></script>
+    <script src="../js/sha1.js"></script>
+    <script src="../js/sign.js"></script>
+    <!--<script src="js/checkLogin.js"></script>-->
+    <script src="../js/loading.js"></script>
+    <title>我的</title>
+</head>
+<body>
+
+<!--
+| ------------------------------------------
+| user_page
+| ------------------------------------------
+| Here are user_page html
+|
+-->
+<div id="user_page">
+
+    <div class="loader">
+        <div class="loader-content">
+            <img src="../images/loading.gif" alt="Loader" class="loader-loader" />
+        </div>
+    </div>
+
+    <div class="wb100">
+        
+        <div class="pa15">
+            <div class="wb100 h45px lh45px warpper-blue radius5 text-center" @click="download('https://github.com/apicloudcom/APICloud-7Days-Online-Training-Tutorials/archive/master.zip')">
+                下载文件
+            </div>
+            <p>进度： %{{plan}}</p>
+        </div>
+
+        <div class="clear1"></div>
+
+        <div class="pa15">
+            <div class="wb100 h45px lh45px warpper-blue radius5 text-center" @click="imageCache('http://a.hiphotos.baidu.com/image/w%3D400/sign=2abe1c77d4ca7bcb7d7bc62f8e086b3f/64380cd7912397ddf9f4bdb05a82b2b7d1a287f0.jpg')">
+                缓存图片
+            </div>
+            <p>本地图片路径：{{cacheUrl}}</p>
+
+            <div class="wb100 img-area">
+                <img :src="cacheUrl">
+            </div>
+        </div>
+
+        <div class="pa15">
+            <div class="wb100 h45px lh45px warpper-blue radius5 text-center" @click="getCacheSize()">
+                计算本地缓存
+            </div>
+            <p>缓存大小： {{cacheSize}}</p>
+        </div>
+
+        <div class="pa15">
+            <div class="wb100 h45px lh45px warpper-blue radius5 text-center" @click="clearCache()">
+                清除本地缓存
+            </div>
+            <p>缓存大小： {{cacheSize}}</p>
+        </div>
+
+        <div class="pa15">
+            <div class="wb100 h45px lh45px warpper-blue radius5 text-center" @click="notification()">
+                设置定时推送消息
+            </div>
+        </div>
+
+        <div class="pa15">
+            <div class="wb100 h45px lh45px warpper-blue radius5 text-center" @click="notification2('推送标题', '这是一条推送消息')">
+                立即推送推送消息
+            </div>
+        </div>
+
+        <div class="pa15">
+            <div class="wb100 h45px lh45px warpper-blue radius5 text-center" @click="call('10086')">
+                拨打电话
+            </div>
+        </div>
+
+        <div class="pa15">
+            <div class="wb100 h45px lh45px warpper-blue radius5 text-center" @click="setAppIconBadge(5)">
+                设置应用未读消息数
+            </div>
+        </div>
+
+        <div class="pa15">
+            <div class="wb100 h45px lh45px warpper-blue radius5 text-center" @click="openPicker()">
+                打开日期插件
+            </div>
+        </div>
+
+        <div class="pa15">
+            <div class="wb100 h45px lh45px warpper-blue radius5 text-center" @click="getPicture()">
+                调用本地相册/相机
+            </div>
+        </div>
+
+
+    </div>
+
+
+</div>
+
+<script>
+
+    window.apiready = function(){
+        var vm = new Vue({
+            el: "#user_page",
+            data: {
+                user: {},
+                cacheUrl: 0,
+                cacheSize: 0,
+                plan: 0
+            },
+            methods: {
+                /**
+                 * 下载文件
+                 * @param url           文件路径
+                 */
+                download: function (url) {
+
+                    var _this = this;
+
+                    api.download({
+                        url: url,
+                        savePath: 'fs://test.rar',
+                        report: true,
+                        cache: true,
+                        allowResume: true
+                    }, function(ret, err) {
+                        _this.plan = ret.percent;
+                        if (ret.state == 1) {
+                            //下载成功
+                            alert('下载成功');
+                        } else {
+
+                        }
+                    });
+                },
+                /**
+                 * 缓存图片
+                 * @param url               图片地址
+                 */
+                imageCache: function (url) {
+                    var _this = this;
+                    api.imageCache({
+                        url: url
+                    }, function(ret, err) {
+                        _this.cacheUrl = ret.url;
+                    });
+                },
+                /**
+                 * 获取偏好设置（类似于cookie）
+                 * @param key               key
+                 */
+                getPrefs: function (key) {
+                     //异步
+                     api.getPrefs({
+                         key: key
+                     }, function(ret, err) {
+                         var userName = ret.value;
+                     });
+                     //同步
+                     var userName = api.getPrefs({
+                         sync: true,
+                         key: key
+                     });
+                },
+                /**
+                 * 设置偏好设置（类似于cookie）
+                 * @param key               key
+                 * @param value             value
+                 */
+                setPrefs: function (key, value) {
+                    api.setPrefs({
+                        key: key,
+                        value: value
+                    });
+                },
+                /**
+                 * 移除偏好设置（类型于cookie）
+                 * @param key               key
+                 */
+                removePrefs: function (key) {
+                    api.removePrefs({
+                        key: key
+                    });
+                },
+                /**
+                 * 获取本地缓存大小
+                 */
+                getCacheSize: function () {
+                    //异步返回结果：
+                    api.getCacheSize(function(ret) {
+                        var size = ret.size;
+                    });
+
+                    //同步返回结果：
+                    var size = api.getCacheSize({
+                        sync: true
+                    });
+
+                    this.cacheSize = size;
+
+                },
+                /**
+                 * 清除本地缓存
+                 */
+                clearCache: function () {
+                    var _this = this;
+                    api.clearCache(function() {
+                        api.toast({
+                            msg: '清除完成'
+                        });
+                        _this.cacheSize = 0;
+                    });
+                },
+
+                /**
+                 * 定时推送
+                 */
+                notification: function () {
+                    api.notification({
+                        notify: {
+                            content: '测试推送消息'
+                        },
+                        alarm: {
+                            hour: 16,
+                            minutes: 46,
+                            daysOfWeek: [2, 3, 4, 5, 6]
+                        }
+                    }, function(ret, err) {
+                        var id = ret.id;
+                        api.toast({
+                            msg: '设置成功'
+                        });
+                    });
+                },
+                /**
+                 * 立即推送
+                 * @param content           消息
+                 */
+                notification2: function (title, content) {
+                    api.notification({
+                        notify: {
+                            title: title,
+                            content: content
+                        },
+                    }, function(ret, err) {
+                        var id = ret.id;
+                        api.toast({
+                            msg: '发送成功'
+                        });
+                    });
+                },
+                /**
+                 * 拨打电话
+                 * @param tel
+                 */
+                call: function (tel) {
+                    api.call({
+                        type: 'tel_prompt',
+                        number: tel
+                    });
+                },
+                /**
+                 * 设置应用图标未读消息数
+                 * @param num
+                 */
+                setAppIconBadge: function (num) {
+                    api.setAppIconBadge({
+                        badge: num
+                    });
+                    api.toast({
+                        msg: '设置成功'
+                    });
+                },
+                /**
+                 * 调用日期插件
+                 */
+                openPicker: function () {
+
+                    api.openPicker({
+                        type: 'date_time',
+                        date: '2014-05-01 12:30',
+                        title: '选择时间'
+                    }, function(ret, err) {
+                        if (ret) {
+                            alert(JSON.stringify(ret));
+                        } else {
+                            alert(JSON.stringify(err));
+                        }
+                    });
+
+                },
+                /**
+                 * 调用相机/相册
+                 */
+                getPicture: function () {
+                    api.getPicture({
+                        //sourceType
+//                        library            //图片库
+//                        camera            //相机
+//                        album            //相册
+                        sourceType: 'library',
+                        encodingType: 'jpg',            //jpg or png
+                        mediaValue: 'pic',              //pic or video
+                        destinationType: 'url',         //url or base64
+                        allowEdit: true,                //拍照或选取后是否可以编辑  默认false 不可编辑
+                        quality: 50,
+                        targetWidth: 100,               //压缩图片的宽度  默认不压缩
+                        targetHeight: 100,              //压缩图片的高度  默认不压缩
+                        saveToPhotoAlbum: false         //完成后保存至相册    默认不保存
+                    }, function(ret, err) {
+                        if (ret) {
+                            alert(JSON.stringify(ret));
+                        } else {
+                            alert(JSON.stringify(err));
+                        }
+                    });
+                },
+
+            },
+            created: function created() {
+
+                //底部上滑的提示菜单
+//                api.actionSheet({
+//                    title: '底部弹出框测试',
+//                    cancelTitle: '这里是取消按钮',
+//                    destructiveTitle: '红色警告按钮',
+//                    buttons: ['1', '2', '3']
+//                }, function(ret, err) {
+//                    var index = ret.buttonIndex;
+//                });
+
+
+                //加载动画
+//                api.showProgress({
+//                    title: '努力加载中...',
+//                    text: '3秒后关闭...',
+//                    modal: false
+//                });
+
+                //关闭加载动画
+//                setTimeout(function () {
+//                    api.hideProgress();
+//                }, 3000);
+
+
+                //提示消息
+//                api.toast({
+//                    msg: '网络错误',
+//                    duration: 2000,       //自动消失时间
+//                    location: 'bottom'    // top顶部 middle中间 bottom底部
+//                });
+
+
+
+
+            }
+        });
+    }
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="pragma" content="no-cache">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta content="telephone=no,email=no" name="format-detection" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no"/>
+    <title>请选择一条说说</title>
+    <!--css-->
+    <link rel="stylesheet" href="../css/loading.css">
+    <link rel="stylesheet" href="../css/common.css">
+    <link rel="stylesheet" href="../css/select-shuoshuo.css">
+    <link rel="stylesheet" href="../css/payment-popup.css">
+
+    <!--js-->
+    <script src="../js/jquery-2.1.4.js"></script>
+    <script src="../js/loading.js"></script>
+    <script src="../js/vue.js"></script>
+    <script src="../js/interface.js?v=24"></script>
+    <script src="../js/base.js"></script>
+    <script src="../js/md5_ch.js"></script>
+</head>
+<body>
+    <div id="select_page">
+
+        <div class="loader">
+            <div class="loader-content">
+                <img src="../images/loading.gif" alt="Loader" class="loader-loader" />
+            </div>
+        </div>
+
+        <div class="header">
+            <span class="back" @click="goBack"><img src="../images/back.png" alt="后退"></span>
+            <span class="title">请选择一条说说</span>
+        </div>
+
+        <div class="input">
+            <div class="warpper">
+                <input type="text" placeholder="输入QQ号" class="qq" v-model="qq" v-on:input="clearSpeak">
+                <span @click="getShuo">获取</span>
+            </div>
+        </div>
+
+        <div class="danger clearfix">
+            <p class="content">必须开启空间所有人访问权限</p>
+        </div>
+
+        <div class="list" v-if="data.length != 0 && seen">
+            <ul v-show="!loading">
+                <li v-for="var (val,index) in data" @click="goRefresh(val.content,val.tid)">
+                    {{val.content}}
+                </li>
+            </ul>
+
+            <div class="loading" v-show="loading">
+                <img src="../images/loading22.gif" alt="Loader"/>
+            </div>
+        </div>
+
+        <transition name="fade">
+            <div class="alert-tips" v-if="show">{{notice}}</div>
+        </transition>
+
+    </div>
+
+    <script>
+        "use strict";
+
+
+        window.apiready = function() {
+
+            var vm = new Vue({
+                el: "#select_page",
+                data: {
+                    list: false,
+                    qq: "",
+                    data: [],
+                    otherQQ: "",
+                    seen: false,
+                    loading: false,
+                    notice: "",
+                    show: false,
+                    type_id: "",
+                    type_name: ""
+                },
+                methods: {
+                    goBack: function () {
+                        api.closeWin();
+                    },
+                    clearSpeak: function () {
+                        this.seen = false;
+                    },
+                    getShuo: function () {
+                        var _this = this;
+                        _this.otherQQ = _this.qq;
+                        if (_this.qq == "" || isNaN(parseInt(_this.qq))) {
+                            _this.show = true;
+                            _this.notice = "请正确输入QQ号";
+                            if (_this.show) {
+                                var timer1 = setTimeout(function () {
+                                    _this.show = false;
+                                }, 2000)
+                            }
+                            return false
+                        }
+                        baseAjax.getShuoshuo(_this.qq, function (res, msg) {
+                            if (res.msg == "暂无数据") {
+                                _this.show = true;
+                                _this.notice = "你没有发表任何说说";
+                                if (_this.show) {
+                                    var timer1 = setTimeout(function () {
+                                        _this.show = false;
+                                    }, 1000)
+                                }
+                            } else {
+                                _this.loading = true;
+                                _this.seen = true;
+                                _this.data = res.data;
+                                console.info(_this.data);
+                                var timer2 = setTimeout(function () {
+                                    _this.loading = false;
+                                }, 1000);
+                            }
+                        })
+                    },
+                    goRefresh: function (content, tid) {
+                        api.openWin({
+                            name: 'refreshShuoshuo',
+                            url: 'refresh-shuoshuo.html',
+                            pageParam: {qq: this.qq, content: content, tid: tid, type_id: type_id},
+                            bgColor: '#fff'
+                        });
+                    }
+                },
+                created: function () {
+                    var _this = this;
+                    _this.type_id = api.pageParam.type_id;
+                }
+            })
+        }
+    </script>
+</body>
+</html>

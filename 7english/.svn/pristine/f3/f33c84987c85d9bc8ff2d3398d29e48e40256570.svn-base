@@ -1,0 +1,92 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,initial-scale=1.0,width=device-width"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>Hello APP</title>
+    <!-- 7E css -->
+    <link rel="stylesheet" href="css/base.css?v=23">
+    <link rel="stylesheet" href="css/style.css">
+    <!-- Element-UI css -->
+    <link rel="stylesheet" href="css/element-ui@1.2.4.css">
+    <!-- 7E js -->
+    <script src="js/jquery-2.1.4.js"></script>
+    <script src="js/vue.js"></script>
+    <!-- Element-UI js -->
+    <script src="js/element-ui@1.2.4.js"></script>
+    <script src="js/vue-component.js?v=23"></script>
+    <script src="js/base.js"></script>
+    <script src="js/sha1.js"></script>
+    <script src="js/interface.js?v=25"></script>
+</head>
+<body style="background: #fff;">
+    <div class="wb100" id="main_page">
+        <!--头部-->
+        <div class="wb100 h30px pat5 pab5">
+            <div class="head-nav" v-for="(item,index) in navText" @click="changeNav(index)" tapmode="">
+                <span :class="index == currentNav ? 'head-nav-active' : ''">{{item}}</span>
+            </div>
+        </div>
+    </div>
+</body>
+<script type="text/javascript">
+
+    var vm = new Vue({
+        el: "#main_page",
+        data: {
+            currentNav: 0,
+            navText : ['精选','分类','我的','搜索'],
+        },
+        methods: {
+            changeNav: function changeNav(i){
+                this.currentNav = i;
+                api.setFrameGroupIndex({
+                    name: 'group1',
+                    index: i,
+                    scroll: true
+                });
+            },
+        },
+        created: function created() {
+
+            var _this = this;
+
+            apiready = function(){
+                api.openFrameGroup({
+                    name: 'group1',
+                    rect: {
+                        x: 0,
+                        y: 40,
+                        w: 'auto',
+                        h: 'auto'
+                    },
+                    frames: [{
+                        name: 'index',
+                        url: 'html/index.html',
+                        bgColor: '#fff'
+                    }, {
+                        name: 'classify',
+                        url: 'html/classify.html',
+                        bgColor: '#fff'
+                    }, {
+                        name: 'user',
+                        url: 'html/user.html',
+                        bgColor: '#fff'
+                    }, {
+                        name: 'search',
+                        url: 'html/search.html',
+                        bgColor: '#fff'
+                    }]
+                }, function(ret, err) {
+                    _this.currentNav = ret.index;
+                });
+
+            };
+        }
+
+    });
+
+
+</script>
+</html>

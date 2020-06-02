@@ -1,0 +1,155 @@
+.banner img{
+    display: block;
+    width: 100%;
+    height:auto;
+}
+.banner .notice{
+    padding:0px 10px;
+    height:30px;
+    line-height: 30px;
+}
+.banner .notice .horn{
+    float: left;
+    margin-top: 5px;
+    width:20px;
+    height:20px;
+}
+.banner .notice .content{
+    float: left;
+    margin-left: 12px;
+    width: 80%;
+    font-size:1rem;
+    color: #ff6461;
+    white-space:nowrap;
+    overflow: hidden;
+}
+.banner .notice .content ul{
+    min-width: 500px;
+}
+.banner .notice .content ul li{
+    display: inline-block;
+}
+.order-service{
+    position: relative;
+    padding:5px 0;
+}
+.order-service div{
+    float: left;
+}
+.order-service .box{
+    display: inline-block;
+    width: 49%;
+    height: 50px;
+    text-align: center;
+}
+.order-service .box img{
+    width: 16%;
+    max-width: 50px;
+    height:auto;
+    vertical-align:middle;
+}
+.order-service .box span{
+    font-size: 1.2rem;
+    line-height: 50px;
+}
+.order-service .vertical{
+    position: absolute;
+    left: 50%;
+    top:50%;
+    margin-left: -1px;
+    margin-top: -10px;
+    background:#efefef;
+    border-radius:1px;
+    width:2px;
+    height:20px;
+}
+.warpper{
+    padding: 30px 15px 15px 15px;
+}
+.warpper .item .title{
+    position: relative;
+    padding:0 15px;
+    height:25px;
+}
+.warpper .item .title .line{
+    position: absolute;
+    top:50%;
+    left: 0;
+    margin-top: -1px;
+    height:1px;
+    background: #CCCCCC;
+    width: 100%;
+}
+.warpper .item .title .content{
+    position: absolute;
+    top:50%;
+    left: 50%;
+    margin-left: -20%;
+    margin-top: -14px;
+    padding:0 10px;
+    width: 40%;
+    height:25px;
+    text-align: center;
+    background: #FFFFFF;
+    z-index: 999;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+.warpper .item .title .content span{
+    margin-left: 6px;
+    font-size:1.2rem;
+}
+.warpper .item .title .content img{
+    display: inline-block;
+    width: 25px;
+    height:25px;
+    vertical-align: middle;
+    margin-bottom: 7px;
+}
+.warpper .item .main{
+    margin-top: 20%;
+    font-size:0;
+}
+.warpper .item .main li{
+    position: relative;
+    display: inline-block;
+    width: 33.33333%;
+    text-align: center;
+    margin-bottom: 15%;
+}
+.warpper .item .main li .icon{
+    height:30px;
+    text-align: center;
+    margin-bottom: 26%;
+    border-right: 1px solid #CCCCCC;
+    line-height: 30px;
+}
+.warpper .item .main li:nth-child(3n) .icon{
+    border-right: none;
+}
+.warpper .item .main li .icon>img{
+    max-width: 50px;
+    width: 30%;
+    height:auto;
+    vertical-align: middle;
+}
+.warpper .item .main li .tagging{
+    position: absolute;
+    right: 10px;
+    top:-30px;
+    width: 30%;
+    text-align: center;
+    line-height: 22px;
+    color: #FFFFFF;
+    font-size:12px;
+}
+.warpper .item .main li .tagging img{
+    max-width: 50px;
+    width: 100%;
+    height:auto;
+}
+.warpper .item .main li .bottom-info{
+    font-size:1rem;
+    color: #4a4a4a;
+}
